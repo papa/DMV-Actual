@@ -4,7 +4,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "chrono"
 #include "thread"
-
+#include "ctime"
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -23,9 +23,10 @@ MainWindow::~MainWindow()
 {
 	delete ui;
 }
-
+bool tru = true;
 void MainWindow::on_startBtn_clicked()
 {
+    tru = true;
     for(int i=0;i<6;i++)
     {
        mTester.prevPattern();
@@ -66,18 +67,81 @@ void MainWindow::obelezavanje(int i,int j)
         obelezavanje(i,j+1);
 }
 
+
+
+
+
+
+int redovi;
+int kolone;
+int centri[256][2];
+pair<int,int> matrica[20][20];
+int sens = 10;
+
+void napraviMatricu()
+{
+    for(int i = 0;i<redovi;i++)
+    {
+        vector<pair<int,int> > v;
+        for(int j = 0;j<kolone;j++)
+        {
+            int ind = i*kolone+j;
+            v.push_back({centri[ind][1],centri[ind][0]});
+        }
+        sort(v.begin(),v.end());
+        for(int j=0;j<kolone;j++)
+        {
+            matrica[i][j].first = v[j].second;
+            matrica[i][j].second = v[j].first;
+        }
+    }
+}
+
+void odrediDimenzije(int nm)
+{
+    if(nm==64)
+    {
+        redovi = 8;
+        kolone = 8;
+    }
+    else if(nm==256)
+    {
+        redovi = 16;
+        kolone = 16;
+    }
+    else
+    {
+        //todo
+        //proveri gde je y koordinata
+        //razlika da zavisi od ukupne visine
+        int y8 = centri[7][0];
+        int y9 = centri[8][0];
+        if(max(y9,y8)-min(y8,y9)<=20)
+        {
+            redovi = 8;
+            kolone = 16;
+        }
+        else
+        {
+            redovi = 16;
+            kolone = 8;
+        }
+    }
+    napraviMatricu();
+}
+
 void MainWindow::on_obeleziBtn_clicked()
 {
-    mTester.nextPattern();
-    this_thread::sleep_for(chrono::milliseconds(100));
+    /*mTester.nextPattern();
+    clock_t wait = 2000 + clock();
+    while(wait>clock());
     mTester.nextStep();
-    this_thread::sleep_for(chrono::milliseconds(5000));
-    mTester.prevStep();
-    this_thread::sleep_for(chrono::milliseconds(5000));
-    m_frameTimer.stop();
-    m_videoCapture.release();
+    wait = 2000 + clock();
+    while(wait>clock());*/
+    //todo
+    inRange(m_mat, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
+    tru = false;
     int belo;
-    int centri[256][2];
     int c=0;
     pixelPtr = (uint8_t*)m_mat.data;
     for(int i=0;i<m_mat.rows;i++)
@@ -94,8 +158,18 @@ void MainWindow::on_obeleziBtn_clicked()
                 obelezavanje(i,j);
                 centri[c][1]=(jMin+jMax)/2;
                 centri[c][0]=(iMin+iMax)/2;
+                qDebug() << centri[c][0] << " " << centri[c][1] << "\n";
                 c++;
             }
+        }
+    }
+    odrediDimenzije(c);
+    for(int i=0;i<redovi;i++)
+    {
+        qDebug() << "novi red";
+        for(int j=0;j<kolone;j++)
+        {
+            qDebug() << matrica[i][j].first << " " << matrica[i][j].second;
         }
     }
     qDebug() << "show";
@@ -115,15 +189,15 @@ void MainWindow::on_stopBtn_clicked()
 
 void MainWindow::onFrameTimer()
 {
+    if(tru){
     if (!m_videoCapture.isOpened() || !m_videoCapture.read(m_mat) || m_mat.empty())
 	{
         on_stopBtn_clicked();
 		return;
     }
     //Indijac se zove Sadekar
-    int sens = 10;
-    inRange(m_mat, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
     imshow("Output", m_mat);
+}
 }
 
 void MainWindow::on_brightBtn_clicked()
@@ -132,4 +206,79 @@ void MainWindow::on_brightBtn_clicked()
     mTester.setBrightness(value);
 }
 
+void testiraj()
+{
 
+}
+
+void MainWindow::preracunajPozicije()
+{
+    //zastava
+    //sve
+    //4
+    //vertikalne
+    //horizontalne
+    //sporedna
+    //glavna
+    int trenutniRaspored[10][30][redovi][kolone];
+    int pattern;
+
+    //pattern 0
+
+    for(int i=0;i<redovi/4;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 1;
+
+    for(int i=redovi/4;i<redovi/2;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 3;
+
+    for(int i=redovi/2;i<redovi*3/4;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 4;
+
+    //testiraj();
+    //mTester.nextPattern();
+
+    //pattern 1
+    for(int i=0;i<redovi;i++)
+        for(int j=0;j<kolone;j++)
+            for(int k = 1;k<=6;k++)
+                trenutniRaspored[1][k-1][i][j] = k;
+
+   //pattern 2
+
+
+    mTester.nextPattern();
+
+    //pattern 3
+
+
+    int cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+        int k1 = 0;
+        int k2 = kolone/2+1;
+        while(k1<(kolone/2-1))
+        {
+            for(int i=0;i<redovi;i++)
+            {
+                trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] = k;
+            }
+            k1++;
+            k2++;
+            cnt++;
+        }
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        cnt++;
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        cnt++;
+    }
+
+
+
+    //pattern 4
+
+    //pattern 5
+
+}

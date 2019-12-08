@@ -47,6 +47,7 @@ private slots:
     void on_nextPatternBtn_clicked() { mTester.nextPattern(); }
 
 	void on_brightBtn_clicked();
+    void preracunajPozicije();
 
     void on_obeleziBtn_clicked();
     void obelezavanje(int i,int j);
