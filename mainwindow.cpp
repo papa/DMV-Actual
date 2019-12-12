@@ -68,10 +68,6 @@ void MainWindow::obelezavanje(int i,int j)
 }
 
 
-
-
-
-
 int redovi;
 int kolone;
 int centri[256][2];
@@ -222,8 +218,9 @@ void MainWindow::preracunajPozicije()
     //glavna
     int trenutniRaspored[10][30][redovi][kolone];
     int pattern;
+    int cnt;
 
-    //pattern 0
+    //pattern 0 zastava
 
     for(int i=0;i<redovi/4;i++)
         for(int j=0;j<kolone;j++)
@@ -240,7 +237,7 @@ void MainWindow::preracunajPozicije()
     //testiraj();
     //mTester.nextPattern();
 
-    //pattern 1
+    //pattern 1 svi
     for(int i=0;i<redovi;i++)
         for(int j=0;j<kolone;j++)
             for(int k = 1;k<=6;k++)
@@ -248,13 +245,42 @@ void MainWindow::preracunajPozicije()
 
    //pattern 2
 
+   int r1 = 0;
+   int k1 = 0;
+   int r2 = 0;
+   int k2 = kolone/2 + 1;
+   int r3 = redovi/2 + 1;
+   int k3 = 0;
+   int r4 = redovi/2+1;
+   int k4 = kolone/2+1;
 
-    mTester.nextPattern();
+   cnt = 0;
 
-    //pattern 3
+   for(int k=1;k<=6;k++)
+   {
+       while(k1 < kolone/2 -1)
+       {
+           trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = trenutniRaspored[2][cnt][r3][k3] =
+                   trenutniRaspored[2][cnt][r4][k4] =k;
+           cnt++;
+           k1++;
+           k2++;
+           k3++;
+           k4++;
+       }
+       trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+       cnt++;
+       k1++;
+       trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+       //dovrsi
+   }
+
+   // mTester.nextPattern();
+
+    //pattern 3 kolone
 
 
-    int cnt = 0;
+    cnt = 0;
     for(int k=1;k<=6;k++)
     {
         int k1 = 0;
@@ -271,13 +297,35 @@ void MainWindow::preracunajPozicije()
         }
         for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
         cnt++;
+        k1++;
         for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
         cnt++;
     }
 
 
+    //pattern 4 redovi
 
-    //pattern 4
+    cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+        int r1 = 0;
+        int r2 = redovi/2+1;
+        while(r1 < (redovi/2-1))
+        {
+            for(int i = 0;i<kolone;i++)
+            {
+                trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = k;
+            }
+            r1++;
+            r2++;
+            cnt++;
+        }
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        cnt++;
+        r1++;
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        cnt++;
+    }
 
     //pattern 5
 
