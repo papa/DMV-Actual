@@ -9,19 +9,19 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-	ui->setupUi(this);
-	ui->fpsLineEdit   ->setValidator(m_fpsIntV);
-	ui->brightLineEdit->setValidator(m_brtIntV);
+    ui->setupUi(this);
+    ui->fpsLineEdit   ->setValidator(m_fpsIntV);
+    ui->brightLineEdit->setValidator(m_brtIntV);
 
-	m_frameTimer.setTimerType(Qt::TimerType::PreciseTimer);
-	m_frameTimer.setSingleShot(false);
-	QObject::connect(&m_frameTimer, &QTimer::timeout         ,
+    m_frameTimer.setTimerType(Qt::TimerType::PreciseTimer);
+    m_frameTimer.setSingleShot(false);
+    QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
 }
 
 MainWindow::~MainWindow()
 {
-	delete ui;
+    delete ui;
 }
 bool tru = true;
 void MainWindow::on_startBtn_clicked()
@@ -33,18 +33,18 @@ void MainWindow::on_startBtn_clicked()
        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 
-	if (m_videoCapture.isOpened()) m_videoCapture.release();
+    if (m_videoCapture.isOpened()) m_videoCapture.release();
 
-	if (   !m_videoCapture.open(ui->sourceLineEdit->text().toUtf8().constData())
-	    || !m_videoCapture.isOpened())
-	{
-		qDebug() << "SOURCE ERROR";
-		return;
-	}
+    if (   !m_videoCapture.open(ui->sourceLineEdit->text().toUtf8().constData())
+        || !m_videoCapture.isOpened())
+    {
+        qDebug() << "SOURCE ERROR";
+        return;
+    }
 
-	const quint16 fps = ui->fpsLineEdit->text().toUInt();
-	m_frameTimer.setInterval(1000 / (fps ? fps : 1));
-	m_frameTimer.start();
+    const quint16 fps = ui->fpsLineEdit->text().toUInt();
+    m_frameTimer.setInterval(1000 / (fps ? fps : 1));
+    m_frameTimer.start();
 }
 uint8_t* pixelPtr;
 int iMax,iMin,jMax,jMin;
@@ -72,7 +72,7 @@ int redovi;
 int kolone;
 int centri[256][2];
 pair<int,int> matrica[20][20];
-int sens = 10;
+int sens = 5;
 
 void napraviMatricu()
 {
@@ -126,6 +126,369 @@ void odrediDimenzije(int nm)
     napraviMatricu();
 }
 
+int trenutniRaspored[10][80][20][20];
+
+void stampa(int p,int c)
+{
+    for(int i =0;i<redovi;i++)
+    {
+        QString s = "";
+        for(int j=0;j<kolone;j++) s = s + QString::number(trenutniRaspored[p][c][i][j]) + " ";
+        qDebug() << s;
+    }
+    qDebug() << "\n";
+}
+
+void provera()
+{
+    //pattern 0
+    qDebug() << 0;
+    stampa(0,0);
+
+    //pattern 1;
+    qDebug() << 1;
+    stampa(1,0);
+
+    //pattern 2
+    qDebug() << 2;
+    for(int c =0;c<10;c++)
+        stampa(2,c);
+
+    //pattern 3
+    qDebug() << 3;
+    for(int c =0;c<10;c++)
+        stampa(3,c);
+
+    //pattern 4
+    qDebug() << 4;
+    for(int c =0;c<10;c++)
+        stampa(4,c);
+
+    //pattern 5
+    qDebug() << 5;
+    for(int c =0;c<10;c++)
+        stampa(5,c);
+
+    //pattern 6
+    qDebug() << 6;
+    for(int c =0;c<10;c++)
+        stampa(6,c);
+}
+
+void MainWindow::preracunajPozicije()
+{
+    //zastava
+    //sve
+    //4
+    //vertikalne
+    //horizontalne
+    //sporedna
+    //glavna
+    int pattern;
+    int cnt;
+
+    qDebug() << "pozvao";
+
+    //pattern 0 zastava
+
+    for(int i=0;i<redovi/4;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 1;
+
+    for(int i=redovi/4;i<redovi/2;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 3;
+
+    for(int i=redovi/2;i<redovi*3/4;i++)
+        for(int j=0;j<kolone;j++)
+           trenutniRaspored[0][0][i][j] = 4;
+
+    qDebug() << "proso";
+
+    //pattern 1 svi
+    for(int i=0;i<redovi;i++)
+        for(int j=0;j<kolone;j++)
+            for(int k = 1;k<=6;k++)
+                trenutniRaspored[1][k-1][i][j] = k;
+
+    qDebug() << "proso";
+
+   //pattern 2
+
+   cnt = 0;
+
+   for(int k=1;k<=6;k++)
+   {
+       int r1,r2,r3,r4;
+       int k1,k2,k3,k4;
+
+       for(int i=0;i<redovi/2-1;i++)
+       {
+          r1 = i;
+          r3 = i+redovi/2+1;
+          r2 = i;
+          r4 = r3;
+          k1 = 0;
+          k2 = kolone/2+1;
+          k3 = 0;
+          k4 = kolone/2+1;
+          while(k1 < kolone/2 -1)
+          {
+               trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = trenutniRaspored[2][cnt][r3][k3] =
+                   trenutniRaspored[2][cnt][r4][k4] =k;
+               cnt++;
+               k1++;
+               k2++;
+               k3++;
+               k4++;
+          }
+           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+           cnt++;
+           k1++;
+           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+           cnt++;
+       }
+
+       for(int i=redovi/2-1;i<=redovi/2;i++)
+       {
+            r1 = i;
+            k1 = 0;
+            r2 = r1;
+            k2 = kolone/2+1;
+            while(k1 < kolone/2-1)
+            {
+                trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = k;
+                cnt++;
+                k1++;
+                k2++;
+            }
+            trenutniRaspored[2][cnt][r1][k1] = k;
+            cnt++;
+            k1++;
+            trenutniRaspored[2][cnt][r1][k1] =  k;
+            cnt++;
+       }
+   }
+
+   qDebug() << "proso";
+
+    //pattern 3 kolone
+
+
+    cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+        int k1 = 0;
+        int k2 = kolone/2+1;
+        while(k1<(kolone/2-1))
+        {
+            for(int i=0;i<redovi;i++)
+            {
+                trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] = k;
+            }
+            k1++;
+            k2++;
+            cnt++;
+        }
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        cnt++;
+        k1++;
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        cnt++;
+    }
+
+
+    qDebug() << "proso";
+
+    //pattern 4 redovi
+
+    cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+        int r1 = 0;
+        int r2 = redovi/2+1;
+        while(r1 < (redovi/2-1))
+        {
+            for(int i = 0;i<kolone;i++)
+            {
+                trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = k;
+            }
+            r1++;
+            r2++;
+            cnt++;
+        }
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        cnt++;
+        r1++;
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        cnt++;
+    }
+
+    qDebug() << "proso";
+
+    //pattern 5
+
+    cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+
+        int r1 = 0;
+        int r2 = 5;
+        int k1 = 3;
+        while(r2 < redovi)
+        {
+            int ko = 0;
+            int t = r1;
+            int re;
+            while(t >= 0)
+            {
+                trenutniRaspored[5][cnt][t][ko] = k;
+                t--;
+                ko++;
+            }
+            t = r2;
+            ko = 0;
+            while(t >= 0)
+            {
+                trenutniRaspored[5][cnt][t][ko] = k;
+                t--;
+                ko++;
+            }
+            re = redovi-1;
+            t = k1;
+            while(t < kolone)
+            {
+                trenutniRaspored[5][cnt][re][t] = k;
+                re--;
+                t++;
+            }
+            cnt++;
+            r1++;
+            r2++;
+            k1++;
+        }
+
+        int k2 = 1;
+        while(k1 < kolone)
+        {
+            int ko = 0;
+            int t = r1;
+            int re;
+            while(t >= 0)
+            {
+                trenutniRaspored[5][cnt][t][ko] = k;
+                t--;
+                ko++;
+            }
+            re = redovi-1;
+            t = k1;
+            while(t < kolone)
+            {
+                trenutniRaspored[5][cnt][re][t] = k;
+                re--;
+                t++;
+            }
+            re = redovi-1;
+            t = k2;
+            while(t < kolone)
+            {
+                trenutniRaspored[5][cnt][re][t] = k;
+                re--;
+                t++;
+            }
+            r1++;
+            k1++;
+            k2++;
+            cnt++;
+        }
+    }
+
+    qDebug() << "proso";
+
+    //pattern 6
+
+    cnt = 0;
+    for(int k=1;k<=6;k++)
+    {
+        int k1 = 0;
+        int k2 = 5;
+        int r1 = 4;
+        int temp;
+        int ko;
+        int re;
+        while(k2<kolone)
+        {
+            re = redovi-1;
+            temp = k1;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][re][temp] = k;
+                temp--;
+                re--;
+            }
+            re = redovi-1;
+            temp = k2;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][re][temp] = k;
+                temp--;
+                re--;
+            }
+            temp = r1;
+            ko = kolone-1;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][temp][ko] = k;
+                temp--;
+                ko--;
+            }
+            r1--;
+            k1++;
+            k2++;
+            cnt++;
+        }
+
+        int r2 = redovi-2;
+
+        while(r1 >= 0)
+        {
+            re = redovi-1;
+            temp = k1;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][re][temp] = k;
+                temp--;
+                re--;
+            }
+            temp = r1;
+            ko = kolone-1;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][temp][ko] = k;
+                temp--;
+                ko--;
+            }
+            temp = r2;
+            ko = kolone-1;
+            while(temp >= 0)
+            {
+                trenutniRaspored[6][cnt][temp][ko] = k;
+                temp--;
+                ko--;
+            }
+            r1--;
+            r2--;
+            k1++;
+            cnt++;
+        }
+    }
+
+    qDebug() << "proso";
+
+    provera();
+}
+
+
 void MainWindow::on_obeleziBtn_clicked()
 {
     /*mTester.nextPattern();
@@ -160,36 +523,28 @@ void MainWindow::on_obeleziBtn_clicked()
         }
     }
     odrediDimenzije(c);
-    for(int i=0;i<redovi;i++)
-    {
-        qDebug() << "novi red";
-        for(int j=0;j<kolone;j++)
-        {
-            qDebug() << matrica[i][j].first << " " << matrica[i][j].second;
-        }
-    }
-    qDebug() << "show";
     for(int i=0;i<c;i++)
     {
         pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
     }
+    preracunajPozicije();
     imshow("Output",m_mat);
 }
 
 void MainWindow::on_stopBtn_clicked()
 {
-	m_frameTimer.stop();
-	m_videoCapture.release();
-	cv::destroyAllWindows();
+    m_frameTimer.stop();
+    m_videoCapture.release();
+    cv::destroyAllWindows();
 }
 
 void MainWindow::onFrameTimer()
 {
     if(tru){
     if (!m_videoCapture.isOpened() || !m_videoCapture.read(m_mat) || m_mat.empty())
-	{
+    {
         on_stopBtn_clicked();
-		return;
+        return;
     }
     //Indijac se zove Sadekar
     imshow("Output", m_mat);
@@ -198,135 +553,10 @@ void MainWindow::onFrameTimer()
 
 void MainWindow::on_brightBtn_clicked()
 {
-	const quint8 value = ui->brightLineEdit->text().toUInt();
+    const quint8 value = ui->brightLineEdit->text().toUInt();
     mTester.setBrightness(value);
 }
 
-void testiraj()
-{
-
-}
-
-void MainWindow::preracunajPozicije()
-{
-    //zastava
-    //sve
-    //4
-    //vertikalne
-    //horizontalne
-    //sporedna
-    //glavna
-    int trenutniRaspored[10][30][redovi][kolone];
-    int pattern;
-    int cnt;
-
-    //pattern 0 zastava
-
-    for(int i=0;i<redovi/4;i++)
-        for(int j=0;j<kolone;j++)
-           trenutniRaspored[0][0][i][j] = 1;
-
-    for(int i=redovi/4;i<redovi/2;i++)
-        for(int j=0;j<kolone;j++)
-           trenutniRaspored[0][0][i][j] = 3;
-
-    for(int i=redovi/2;i<redovi*3/4;i++)
-        for(int j=0;j<kolone;j++)
-           trenutniRaspored[0][0][i][j] = 4;
-
-    //testiraj();
-    //mTester.nextPattern();
-
-    //pattern 1 svi
-    for(int i=0;i<redovi;i++)
-        for(int j=0;j<kolone;j++)
-            for(int k = 1;k<=6;k++)
-                trenutniRaspored[1][k-1][i][j] = k;
-
-   //pattern 2
-
-   int r1 = 0;
-   int k1 = 0;
-   int r2 = 0;
-   int k2 = kolone/2 + 1;
-   int r3 = redovi/2 + 1;
-   int k3 = 0;
-   int r4 = redovi/2+1;
-   int k4 = kolone/2+1;
-
-   cnt = 0;
-
-   for(int k=1;k<=6;k++)
-   {
-       while(k1 < kolone/2 -1)
-       {
-           trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = trenutniRaspored[2][cnt][r3][k3] =
-                   trenutniRaspored[2][cnt][r4][k4] =k;
-           cnt++;
-           k1++;
-           k2++;
-           k3++;
-           k4++;
-       }
-       trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
-       cnt++;
-       k1++;
-       trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
-       //dovrsi
-   }
-
-   // mTester.nextPattern();
-
-    //pattern 3 kolone
 
 
-    cnt = 0;
-    for(int k=1;k<=6;k++)
-    {
-        int k1 = 0;
-        int k2 = kolone/2+1;
-        while(k1<(kolone/2-1))
-        {
-            for(int i=0;i<redovi;i++)
-            {
-                trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] = k;
-            }
-            k1++;
-            k2++;
-            cnt++;
-        }
-        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
-        cnt++;
-        k1++;
-        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
-        cnt++;
-    }
 
-
-    //pattern 4 redovi
-
-    cnt = 0;
-    for(int k=1;k<=6;k++)
-    {
-        int r1 = 0;
-        int r2 = redovi/2+1;
-        while(r1 < (redovi/2-1))
-        {
-            for(int i = 0;i<kolone;i++)
-            {
-                trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = k;
-            }
-            r1++;
-            r2++;
-            cnt++;
-        }
-        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
-        cnt++;
-        r1++;
-        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
-        cnt++;
-    }
-
-    //pattern 5
-
-}
