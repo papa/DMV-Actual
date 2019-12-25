@@ -46,8 +46,12 @@ private slots:
     void on_prevPatternBtn_clicked() { mTester.prevPattern(); }
     void on_nextPatternBtn_clicked() { mTester.nextPattern(); }
 
+    void on_praviMaskuBtn_clicked();
+
 	void on_brightBtn_clicked();
     void preracunajPozicije();
+    void vrtiPaterne();
+    void brojKorakaPoPaternu(int re,int ko);
 
     void on_obeleziBtn_clicked();
     void obelezavanje(int i,int j);
@@ -62,7 +66,6 @@ private:
 	QTimer           m_frameTimer;
 	cv::VideoCapture m_videoCapture;
 	cv::Mat          m_mat;
-
 };
 
 #endif // MAINWINDOW_H

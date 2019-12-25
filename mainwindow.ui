@@ -36,7 +36,7 @@
        <item>
         <widget class="QLineEdit" name="sourceLineEdit">
          <property name="text">
-          <string>rtsp://admin:123Dmv321@192.168.0.99:554/Streaming/Channels/102/</string>
+          <string>rtsp://admin:123Dmv321@192.168.0.99:554/Streaming/Channels/101/</string>
          </property>
         </widget>
        </item>
@@ -290,6 +290,19 @@
      </property>
      <property name="text">
       <string>obelezi</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="praviMaskuBtn">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>100</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pravi Masku</string>
      </property>
     </widget>
    </widget>

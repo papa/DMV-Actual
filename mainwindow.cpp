@@ -23,10 +23,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-bool tru = true;
 void MainWindow::on_startBtn_clicked()
 {
-    tru = true;
     for(int i=0;i<6;i++)
     {
        mTester.prevPattern();
@@ -46,6 +44,7 @@ void MainWindow::on_startBtn_clicked()
     m_frameTimer.setInterval(1000 / (fps ? fps : 1));
     m_frameTimer.start();
 }
+cv::Mat abe;
 uint8_t* pixelPtr;
 int iMax,iMin,jMax,jMin;
 void MainWindow::obelezavanje(int i,int j)
@@ -73,6 +72,13 @@ int kolone;
 int centri[256][2];
 pair<int,int> matrica[20][20];
 int sens = 5;
+int niz[7];
+int matricaBoja[3][12]={
+    {254,255,100,120,80,170,200,255,170,255,220,255},
+    {150,220,200,255,165,255,200,255,140,225,140,205},
+    {140,200,170,200,254,255,200,255,100,170,110,165}
+};;
+int Vri=1,Vrj=0,Vrk=1;
 
 void napraviMatricu()
 {
@@ -498,8 +504,7 @@ void MainWindow::on_obeleziBtn_clicked()
     wait = 2000 + clock();
     while(wait>clock());*/
     //todo
-    inRange(m_mat, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
-    tru = false;
+    inRange(abe, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
     int belo;
     int c=0;
     pixelPtr = (uint8_t*)m_mat.data;
@@ -528,7 +533,7 @@ void MainWindow::on_obeleziBtn_clicked()
         pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
     }
     preracunajPozicije();
-    imshow("Output",m_mat);
+    imshow("Output3",m_mat);
 }
 
 void MainWindow::on_stopBtn_clicked()
@@ -540,21 +545,83 @@ void MainWindow::on_stopBtn_clicked()
 
 void MainWindow::onFrameTimer()
 {
-    if(tru){
-    if (!m_videoCapture.isOpened() || !m_videoCapture.read(m_mat) || m_mat.empty())
+    if (!m_videoCapture.isOpened() || !m_videoCapture.read(abe) || abe.empty())
     {
         on_stopBtn_clicked();
         return;
     }
     //Indijac se zove Sadekar
-    imshow("Output", m_mat);
-}
+    imshow("Output", abe);
 }
 
 void MainWindow::on_brightBtn_clicked()
 {
     const quint8 value = ui->brightLineEdit->text().toUInt();
     mTester.setBrightness(value);
+}
+
+//zastava
+//sve
+//4
+//vertikalne
+//horizontalne
+//sporedna
+//glavna
+
+void MainWindow::brojKorakaPoPaternu(int re,int ko)
+{
+    niz[0]=niz[1]=1;
+    niz[2]=(re/2+1)*(ko/2+1);
+    niz[3]=ko/2+1;
+    niz[4]=re/2+1;
+    niz[5]=(re+ko-1)/3;
+    niz[6]=(re+ko-1)/3;
+}
+void MainWindow::vrtiPaterne()
+{
+    cv::Mat mat;
+    brojKorakaPoPaternu(8,8);
+
+    qDebug() << Vri << " " << Vrj << " " << Vrk;
+    inRange(abe, Scalar(matricaBoja[2][(Vrk-1)*2],matricaBoja[1][(Vrk-1)*2],matricaBoja[0][(Vrk-1)*2] ), Scalar(matricaBoja[2][(Vrk-1)*2+1],matricaBoja[1][(Vrk-1)*2+1],matricaBoja[0][(Vrk-1)*2+1]), mat);
+    imshow("Output2",mat);
+   // mTester.nextStep();
+    Vrj++;
+    if(Vrj==niz[Vri])
+    {
+        Vrj=0;
+        Vrk++;
+        if(Vrk==7)
+        {
+            mTester.nextPattern();
+            Vri++;
+            Vrk=1;
+        }
+        else
+        {
+            mTester.nextStep();
+        }
+    }
+    else
+    {
+        mTester.nextStep();
+    }
+   /* if(Vrk==7)
+    {
+        qDebug () << "radi";
+        Vrk=1;
+        Vri++;
+        mTester.nextPattern();
+    }
+    if(Vri==7)
+    {
+        Vri=0;
+    }*/
+}
+
+void MainWindow::on_praviMaskuBtn_clicked()
+{
+    vrtiPaterne();
 }
 
 
