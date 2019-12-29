@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
 }
-
+int redovi,kolone;
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -39,7 +39,10 @@ void MainWindow::on_startBtn_clicked()
         qDebug() << "SOURCE ERROR";
         return;
     }
-
+    QString kolones=ui->koloneTxt->text();
+    QString redovis=ui->redoviTxt->text();
+    redovi=redovis.toInt();
+    kolone=kolones.toInt();
     const quint16 fps = ui->fpsLineEdit->text().toUInt();
     m_frameTimer.setInterval(1000 / (fps ? fps : 1));
     m_frameTimer.start();
@@ -47,8 +50,10 @@ void MainWindow::on_startBtn_clicked()
 cv::Mat abe;
 uint8_t* pixelPtr;
 int iMax,iMin,jMax,jMin;
+int brkomp;
 void MainWindow::obelezavanje(int i,int j)
 {
+    brkomp++;
     if(i<iMin)iMin=i;
     else if(i>iMax)iMax=i;
     if(j<jMin)jMin=j;
@@ -67,17 +72,15 @@ void MainWindow::obelezavanje(int i,int j)
 }
 
 
-int redovi;
-int kolone;
 int centri[256][2];
 pair<int,int> matrica[20][20];
-int sens = 5;
+int sens = 20;
 int niz[7];
 int matricaBoja[3][12]={
-    {254,255,100,120,80,170,200,255,170,255,220,255},
+    {254,255,100,190,80,170,200,255,170,255,220,255},
     {150,220,200,255,165,255,200,255,140,225,140,205},
-    {140,200,170,200,254,255,200,255,100,170,110,165}
-};;
+    {140,200,170,255,254,255,200,255,100,170,110,165}
+};
 int Vri=1,Vrj=0,Vrk=1;
 
 void napraviMatricu()
@@ -97,16 +100,28 @@ void napraviMatricu()
             matrica[i][j].second = v[j].first;
         }
     }
+
+    /*qDebug() << "Matrica koordinate";
+    for(int i=0;i<redovi;i++)
+    {
+        for(int j=0;j<kolone;j++)
+        {
+            qDebug() << matrica[i][j].first << " " << matrica[i][j].second;
+        }
+        qDebug() << "\n";
+    }
+    qDebug() << "\n";*/
+
 }
 
 void odrediDimenzije(int nm)
 {
-    if(nm==64)
+    if(nm<kolone*redovi)
     {
-        redovi = 8;
-        kolone = 8;
+        //todo izbaci error kako se vec izbacuju errori
+        qDebug()<<kolone*redovi-nm;
     }
-    else if(nm==256)
+    /*else if(nm==256)
     {
         redovi = 16;
         kolone = 16;
@@ -129,7 +144,7 @@ void odrediDimenzije(int nm)
             kolone = 8;
         }
     }
-    napraviMatricu();
+    napraviMatricu();*/
 }
 
 int trenutniRaspored[10][80][20][20];
@@ -491,20 +506,15 @@ void MainWindow::preracunajPozicije()
 
     qDebug() << "proso";
 
-    provera();
+   // provera();
 }
 
 
 void MainWindow::on_obeleziBtn_clicked()
 {
-    /*mTester.nextPattern();
-    clock_t wait = 2000 + clock();
-    while(wait>clock());
-    mTester.nextStep();
-    wait = 2000 + clock();
-    while(wait>clock());*/
     //todo
     inRange(abe, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
+    //imshow("Output4",m_mat);
     int belo;
     int c=0;
     pixelPtr = (uint8_t*)m_mat.data;
@@ -515,11 +525,13 @@ void MainWindow::on_obeleziBtn_clicked()
             belo=pixelPtr[i*m_mat.cols+j];
             if(belo)
             {
+                brkomp=0;
                 iMax=i;
                 iMin=i;
                 jMax=j;
                 jMin=j;
                 obelezavanje(i,j);
+                if(brkomp <=5) continue;
                 centri[c][1]=(jMin+jMax)/2;
                 centri[c][0]=(iMin+iMax)/2;
                 qDebug() << centri[c][0] << " " << centri[c][1] << "\n";
@@ -577,14 +589,117 @@ void MainWindow::brojKorakaPoPaternu(int re,int ko)
     niz[5]=(re+ko-1)/3;
     niz[6]=(re+ko-1)/3;
 }
+
+
+void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
+{
+    //1-dobro (svetli i treba da svetli ili ne svetli i ne treba da svetli)
+    //2-lose(treba da svetli a ne svetli)
+    //3-lose(ne treba da svetli a svetli)
+    //4-lose(svetli drugacijom bojom)
+
+    //todo
+    //odredi precizno granicu
+    int granica = 20;
+
+    uint8_t* pixptr;
+    uint8_t* pixptr2;
+    pixptr = (uint8_t*)m.data;
+    pixptr2 = (uint8_t*)bela.data;
+    int ocena[20][20];
+    for(int i=0;i<redovi;i++)
+        for(int j=0;j<kolone;j++)
+            ocena[i][j] = 1;
+
+    for(int i=0;i<redovi;i++)
+    {
+        for(int j=0;j<kolone;j++)
+        {
+            int yc = matrica[i][j].first;
+            int xc = matrica[i][j].second;
+            int ce = pixptr2[yc*bela.cols + xc];
+            bool upaljen = (ce == 1);
+
+            if(upaljen) qDebug() << "upaljen";
+            else qDebug() << "nije upaljen";
+
+            if(!upaljen && trenutniRaspored[pat][kor][i][j]==0) continue;
+
+            if(upaljen && trenutniRaspored[pat][kor][i][j]==0)
+            {
+                ocena[i][j] = 3;
+                continue;
+            }
+
+            if(!upaljen && trenutniRaspored[pat][kor][i][j])
+            {
+                qDebug() << "ovde 2";
+                ocena[i][j] = 2;
+                continue;
+            }
+
+            int ystart = yc - 25;
+            int xstart = xc - 25;
+            int yend = yc+25;
+            int xend = xc+25;
+            int cntoko = 0;
+
+            qDebug() << ystart << " " << yend << " " << xstart << " " << xend;
+
+            for(int k = ystart;k<=yend;k++)
+            {
+                for(int l=xstart;l<=xend;l++)
+                {
+                    int boja = pixptr[k*m.cols + l];
+                    if(boja) cntoko++;
+                }
+            }
+
+
+            if(cntoko < granica)
+            {
+                ocena[i][j] = 4;
+            }
+
+            qDebug() << cntoko << " ";
+        }
+        qDebug() << "\n";
+    }
+    qDebug() << "\n";
+
+    for(int i=0;i<redovi;i++)
+    {
+        for(int j=0;j<kolone;j++)
+        {
+            qDebug() << ocena[i][j] << " ";
+        }
+        qDebug()<< "\n";
+    }
+    qDebug() << "\n";
+
+}
+
 void MainWindow::vrtiPaterne()
 {
     cv::Mat mat;
+    cv::Mat belaMatrica;
+    //redovi = 8;
+   // kolone = 8;
     brojKorakaPoPaternu(8,8);
 
     qDebug() << Vri << " " << Vrj << " " << Vrk;
+    inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
     inRange(abe, Scalar(matricaBoja[2][(Vrk-1)*2],matricaBoja[1][(Vrk-1)*2],matricaBoja[0][(Vrk-1)*2] ), Scalar(matricaBoja[2][(Vrk-1)*2+1],matricaBoja[1][(Vrk-1)*2+1],matricaBoja[0][(Vrk-1)*2+1]), mat);
+    uint8_t* ptr;
+    ptr = (uint8_t*)belaMatrica.data;
+    for(int i=0;i<redovi;i++)
+       for(int j=0;j<kolone;j++)
+       {
+           ptr[matrica[i][j].first*belaMatrica.cols + matrica[i][j].second] = 0;
+       }
     imshow("Output2",mat);
+    imshow("Output3",belaMatrica);
+    proveraSlike(Vri,Vrj,mat,belaMatrica);
    // mTester.nextStep();
     Vrj++;
     if(Vrj==niz[Vri])
@@ -606,7 +721,9 @@ void MainWindow::vrtiPaterne()
     {
         mTester.nextStep();
     }
-   /* if(Vrk==7)
+
+
+   /*if(Vrk==7)
     {
         qDebug () << "radi";
         Vrk=1;
@@ -619,8 +736,12 @@ void MainWindow::vrtiPaterne()
     }*/
 }
 
+
 void MainWindow::on_praviMaskuBtn_clicked()
 {
+   // redovi = 8;
+   // kolone = 8;
+   // preracunajPozicije();
     vrtiPaterne();
 }
 

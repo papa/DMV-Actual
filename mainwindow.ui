@@ -36,7 +36,7 @@
        <item>
         <widget class="QLineEdit" name="sourceLineEdit">
          <property name="text">
-          <string>rtsp://admin:123Dmv321@192.168.0.99:554/Streaming/Channels/101/</string>
+          <string>rtsp://admin:123Dmv321@192.168.0.99:554/Streaming/Channels/102/</string>
          </property>
         </widget>
        </item>
@@ -64,6 +64,40 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="fpsLabel_2">
+         <property name="text">
+          <string>Kolone:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="koloneTxt">
+         <property name="text">
+          <string>8</string>
+         </property>
+         <property name="maxLength">
+          <number>4</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="fpsLabel_3">
+         <property name="text">
+          <string>Redovi:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="redoviTxt">
+         <property name="text">
+          <string>8</string>
+         </property>
+         <property name="maxLength">
+          <number>4</number>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="startBtn">
