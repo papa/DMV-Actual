@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QIntValidator>
 #include <QDebug>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentRun>
 #include "dmvtestercommunicator.h"
 
 #include "opencv2/opencv.hpp"
@@ -57,6 +59,8 @@ private slots:
 
     void on_obeleziBtn_clicked();
     void obelezavanje(int i,int j);
+    void testiranjeAuto();
+    //void called_from_async();
 
 private:
     DMVTesterCommunicator mTester;
