@@ -28,7 +28,10 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     dmvtestercommunicator.cpp \
-    obelezavanjecentara.cpp
+    obelezavanjecentara.cpp \
+    preracunavanjepozicija.cpp \
+    pattern.cpp \
+    korak.cpp
 
 HEADERS += \
         mainwindow.h \

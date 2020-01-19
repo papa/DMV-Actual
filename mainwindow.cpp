@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dmvtestercommunicator.h"
+#include "pattern.cpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "chrono"
 #include "thread"
@@ -124,7 +125,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             //qDebug() << cntoko << " ";
 
-            if(cntoko < granica)
+            if(cntoko < 1)
             {
                //qDebug() << "svetli drugom bojom";
                 ocena[i][j] = 4;
@@ -772,7 +773,7 @@ void MainWindow::on_obeleziBtn_clicked()
 {
     //todo
     inRange(abe, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
-    //imshow("Output4",m_mat);
+   // imshow("Output4",m_mat);
     int belo;
     int c=0;
     pixelPtr = (uint8_t*)m_mat.data;
@@ -789,7 +790,7 @@ void MainWindow::on_obeleziBtn_clicked()
                 jMax=j;
                 jMin=j;
                 obelezavanje(i,j);
-                if(brkomp <=20) continue;
+                if(brkomp <=5) continue;
                 centri[c][1]=(jMin+jMax)/2;
                 centri[c][0]=(iMin+iMax)/2;
                 qDebug() << centri[c][0] << " " << centri[c][1] << "\n";
@@ -803,9 +804,9 @@ void MainWindow::on_obeleziBtn_clicked()
         pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
     }
     preracunajPozicije();
-    //imshow("Output3",m_mat);
+    imshow("Output3",m_mat);
 
-     QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+     //QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
 }
 
 void MainWindow::on_stopBtn_clicked()
@@ -830,6 +831,8 @@ void MainWindow::on_brightBtn_clicked()
 {
     const quint8 value = ui->brightLineEdit->text().toUInt();
     mTester.setBrightness(value);
+
+    //Pattern
 }
 
 //zastava
