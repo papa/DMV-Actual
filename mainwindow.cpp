@@ -18,8 +18,7 @@ int niz[7];
 int matricaBoja[3][12]={
     {230,255,100,190,80,170,200,255,170,255,220,255},
     {130,230,200,255,165,255,200,255,140,225,140,205},
-    {120,210,170,255,254,255,200,255,100,170,110,165}
-};
+    {120,210,170,255,254,255,200,255,100,170,110,165}};
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -231,6 +230,58 @@ void MainWindow::on_praviMaskuBtn_clicked()
    vrtiPaterne();
 }
 
+QString formatiraj(int x)
+{
+    if(x<10) return "0"+QString::number(x);
+    else return QString::number(x);
+}
+
+QString imeOperatera;
+QString radniNalog;
+QString redniBrojPloce;
+QString opisGreske;
+QString path;
+
+void upisiRezultateUFajl(int imaGresku,QString poruka,int korak)
+{
+    QTime vreme= QTime::currentTime();
+    int sati=vreme.hour();
+    int minuti=vreme.minute();
+    int sekunde = vreme.second();
+
+    QString tacnovreme = QString::number(sati) + ":" + QString::number(minuti)+":"+QString::number(sekunde);
+    QString ufajl = tacnovreme+","+imeOperatera+","+radniNalog+","+redniBrojPloce;
+
+    if(imaGresku) ufajl+=", greska na koraku "+ QString::number(korak)+ +","+poruka;
+    else ufajl+=", sve u redu";
+
+    QFile qfile(path);
+    qfile.open(QIODevice::WriteOnly);
+    qfile.write(ufajl.toUtf8());
+    qfile.close();
+}
+
+void napraviFajl()
+{
+    QDate datum = QDate::currentDate();
+    int dan=datum.day();
+    int mesec=datum.month();
+    int godina=datum.year();
+
+    QTime vreme= QTime::currentTime();
+    int sati=vreme.hour();
+    int minuti=vreme.minute();
+
+    QString datumVreme=QString::number(godina)+"_"+formatiraj(mesec)+"_"+formatiraj(dan)+"_"+formatiraj(sati)+"_"+formatiraj(minuti);
+    QString imeFajla = "izvestaj_o_testiranju_"+datumVreme+".txt";
+    path = "D:/Resursi_Konkurs2020/"+imeFajla;
+    qDebug() << imeFajla;
+
+    QFile qfile(path);
+    qfile.open(QIODevice::WriteOnly);
+    qfile.close();
+}
+
 void MainWindow::on_startBtn_clicked()
 {
     for(int i=0;i<6;i++)
@@ -254,7 +305,17 @@ void MainWindow::on_startBtn_clicked()
     const quint16 fps = ui->fpsLineEdit->text().toUInt();
     m_frameTimer.setInterval(1000 / (fps ? fps : 1));
     m_frameTimer.start();
+
+    napraviFajl();
+
+    imeOperatera=ui->imeTestera->text();
+   // qDebug() << imeOperatera;
+    radniNalog=ui->radniNalog->text();
+    //qDebug() << radniNalog;
+    redniBrojPloce=ui->redniBrojPloce->text();
+    //qDebug() << redniBrojPloce;
 }
+
 uint8_t* pixelPtr;
 int iMax,iMin,jMax,jMin;
 int brkomp;

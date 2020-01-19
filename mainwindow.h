@@ -7,6 +7,8 @@
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentRun>
 #include "dmvtestercommunicator.h"
+#include <QDateTime>
+#include <QFile>
 
 #include "opencv2/opencv.hpp"
 

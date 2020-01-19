@@ -27,7 +27,8 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    dmvtestercommunicator.cpp
+    dmvtestercommunicator.cpp \
+    obelezavanjecentara.cpp
 
 HEADERS += \
         mainwindow.h \
