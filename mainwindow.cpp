@@ -16,10 +16,17 @@ int trenutniRaspored[10][80][20][20];
 int centri[256][2];
 pair<int,int> matrica[20][20];
 int niz[7];
-int matricaBoja[3][12]={
+int progress=0;
+/*int matricaBoja[3][12]={
     {230,255,100,190,80,170,200,255,170,255,220,255},
     {130,230,200,255,165,255,200,255,140,225,140,205},
-    {120,210,170,255,254,255,200,255,100,170,110,165}};
+    {120,210,170,255,254,255,200,255,100,170,110,165}};*/
+//hsv odozdo na gore
+int matricaBoja[3][12]={
+    {50,255,50,255,50,255,0,255,50,255,50,255},
+    {30,255,30,255,30,255,0,30,30,255,30,255},
+    {150,180,60,93,94,130,0,180,10,25,0,20}
+};
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -81,7 +88,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             int xc = matrica[i][j].second;
             int ce = pixptr2[yc*bela.cols + xc];
 
-           // qDebug() << yc << " " << xc;
+            // qDebug() << yc << " " << xc;
 
             //if(ce) qDebug() << "upaljen";
             //else qDebug() << "nije upaljen";
@@ -159,15 +166,24 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
 extern void MainWindow::vrtiPaterne()
 {
+    //ui->progressBar->setValue(progress);
     cv::Mat mat;
     cv::Mat belaMatrica;
+    cv::Mat hsvsh;
     brojKorakaPoPaternu(8,8);
 
     qDebug() << Vri << " " << Vrj << " " << Vrk;
+    ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(Vri)+", korak "+QString::number(Vrj)+", boja "+QString::number(Vrk));
+    //QLabel *label4 = new QLabel;
+    //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(Vri)+", korak "+QString::number(Vrj)+", boja "+QString::number(Vrk));
     inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
-    inRange(abe, Scalar(matricaBoja[2][(Vrk-1)*2],matricaBoja[1][(Vrk-1)*2],matricaBoja[0][(Vrk-1)*2] ), Scalar(matricaBoja[2][(Vrk-1)*2+1],matricaBoja[1][(Vrk-1)*2+1],matricaBoja[0][(Vrk-1)*2+1]), mat);
+    cvtColor(abe, hsvsh, CV_BGR2HSV);
+    inRange(hsvsh, Scalar(matricaBoja[2][(Vrk-1)*2],matricaBoja[1][(Vrk-1)*2],matricaBoja[0][(Vrk-1)*2] ), Scalar(matricaBoja[2][(Vrk-1)*2+1],matricaBoja[1][(Vrk-1)*2+1],matricaBoja[0][(Vrk-1)*2+1]), mat);
     //imshow("Output2",mat);
+    //cvtColor(mat, mat, CV_HSV2BGR);
+    //imshow("maska",mat);
     //imshow("Output3",belaMatrica);
+    //imshow("Output4",hsvsh);
     proveraSlike(Vri,Vrj,mat,belaMatrica);
     Vrj++;
     if(Vrj==niz[Vri])
@@ -206,8 +222,10 @@ void MainWindow::testiranjeAuto()
 {
     for(int i=0;i<276;i++)
     {
+        progress=(i*100)/276;
+        //ui->progressBar->setValue((i*100)/276);
         vrtiPaterne();
-        long long x = 2500000000;
+        long long x = 2300000000;
         while(x > 0) x--;
 
         //qDebug()<<"testiranje auto";
@@ -806,7 +824,7 @@ void MainWindow::on_obeleziBtn_clicked()
     preracunajPozicije();
     imshow("Output3",m_mat);
 
-     //QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+    QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
 }
 
 void MainWindow::on_stopBtn_clicked()

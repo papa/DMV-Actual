@@ -227,7 +227,86 @@ private:
 
  void sestiPattern()
  {
+     cnt = 0;
+     for(int k=1;k<=6;k++)
+     {
+         int k1 = 0;
+         int k2 = 5;
+         int r1 = 4;
+         int temp;
+         int ko;
+         int re;
+         while(k2<kolone)
+         {
+             re = redovi-1;
+             temp = k1;
+             while(temp >= 0)
+             {
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                // trenutniRaspored[6][cnt][re][temp] = k;
+                 temp--;
+                 re--;
+             }
+             re = redovi-1;
+             temp = k2;
+             while(temp >= 0)
+             {
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                 temp--;
+                 re--;
+             }
+             temp = r1;
+             ko = kolone-1;
+             while(temp >= 0)
+             {
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                 //trenutniRaspored[6][cnt][temp][ko] = k;
+                 temp--;
+                 ko--;
+             }
+             r1--;
+             k1++;
+             k2++;
+             cnt++;
+         }
 
+         int r2 = redovi-2;
+
+         while(r1 >= 0)
+         {
+              re = redovi-1;
+              temp = k1;
+              while(temp >= 0)
+              {
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                  //trenutniRaspored[6][cnt][re][temp] = k;
+                  temp--;
+                  re--;
+              }
+              temp = r1;
+              ko = kolone-1;
+              while(temp >= 0)
+              {
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                  //trenutniRaspored[6][cnt][temp][ko] = k;
+                  temp--;
+                  ko--;
+              }
+              temp = r2;
+              ko = kolone-1;
+              while(temp >= 0)
+              {
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                  //trenutniRaspored[6][cnt][temp][ko] = k;
+                  temp--;
+                  ko--;
+              }
+              r1--;
+              r2--;
+              k1++;
+              cnt++;
+          }
+      }
  }
 
 public:
