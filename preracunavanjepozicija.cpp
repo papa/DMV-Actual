@@ -1,10 +1,9 @@
 #include "mainwindow.h"
 #include "pattern.cpp"
 
-class preracunavanjePozicija
+class preracunavanjepozicija
 {
 private:
- Pattern **sviPatterni;
 
  int redovi;
  int kolone;
@@ -311,17 +310,19 @@ private:
 
 public:
 
-   preracunavanjePozicija(int redovi,int kolone,int brpatterna)
+   Pattern **sviPatterni;
+
+   preracunavanjepozicija(int redovi,int kolone,int brpatterna)
    {
        this->redovi = redovi;
        this->kolone = kolone;
-        sviPatterni=new Pattern*[brpatterna];
-        sviPatterni[0] = new Pattern(6,redovi,kolone);
-        sviPatterni[1] = new Pattern(6*(redovi/2+1)*(kolone/2+1),redovi,kolone);
-        sviPatterni[2] = new Pattern(6*(kolone/2+1),redovi,kolone);
-        sviPatterni[3] = new Pattern(6*(redovi/2+1),redovi,kolone);
-        sviPatterni[4] = new Pattern(6*(redovi+kolone-1)/3,redovi,kolone);
-        sviPatterni[5] = new Pattern(6*(redovi+kolone-1)/3,redovi,kolone);
+       sviPatterni=new Pattern*[brpatterna];
+       sviPatterni[0] = new Pattern(6,redovi,kolone);
+       sviPatterni[1] = new Pattern(6*(redovi/2+1)*(kolone/2+1),redovi,kolone);
+       sviPatterni[2] = new Pattern(6*(kolone/2+1),redovi,kolone);
+       sviPatterni[3] = new Pattern(6*(redovi/2+1),redovi,kolone);
+       sviPatterni[4] = new Pattern(6*(redovi+kolone-1)/3,redovi,kolone);
+       sviPatterni[5] = new Pattern(6*(redovi+kolone-1)/3,redovi,kolone);
    }
 
    void preracunajSvePozicije()

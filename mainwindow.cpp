@@ -1,32 +1,46 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dmvtestercommunicator.h"
-#include "pattern.cpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "chrono"
 #include "thread"
 #include "ctime"
 #include "future"
+#include "obelezavanjecentara.cpp"
+#include "preracunavanjepozicija.cpp"
 
+//zastava
+//sve
+//4
+//vertikalne
+//horizontalne
+//sporedna
+//glavna
 
+pair<int,int>** koordinateCentara;
+Pattern** preracunatRaspored;
+int ukupanBrojKoraka;
 cv::Mat abe;
-int sens = 20;
-int Vri=1,Vrj=0,Vrk=1;
+int sens = 70;
+int trenutniPattern=1;
+int trenutniKorak=0;
+int trenutnaBoja=1;
 int trenutniRaspored[10][80][20][20];
 int centri[256][2];
 pair<int,int> matrica[20][20];
 int niz[7];
 int progress=0;
-/*int matricaBoja[3][12]={
+int boje[6];
+int matricaBoja[3][12]={
     {230,255,100,190,80,170,200,255,170,255,220,255},
     {130,230,200,255,165,255,200,255,140,225,140,205},
-    {120,210,170,255,254,255,200,255,100,170,110,165}};*/
+    {120,210,170,255,254,255,200,255,100,170,110,165}};
 //hsv odozdo na gore
-int matricaBoja[3][12]={
+/*int matricaBoja[3][12]={
     {50,255,50,255,50,255,0,255,50,255,50,255},
     {30,255,30,255,30,255,0,30,30,255,30,255},
     {150,180,60,93,94,130,0,180,10,25,0,20}
-};
+};*/
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -35,7 +49,6 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
     ui->fpsLineEdit   ->setValidator(m_fpsIntV);
     ui->brightLineEdit->setValidator(m_brtIntV);
-
     m_frameTimer.setTimerType(Qt::TimerType::PreciseTimer);
     m_frameTimer.setSingleShot(false);
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
@@ -55,8 +68,46 @@ void MainWindow::brojKorakaPoPaternu(int re,int ko)
     niz[4]=re/2+1;
     niz[5]=(re+ko-1)/3;
     niz[6]=(re+ko-1)/3;
+    ukupanBrojKoraka = niz[1] + niz[2] + niz[3] + niz[4] + niz[5] + niz[6];
 }
 
+QString imeOperatera;
+QString radniNalog;
+QString redniBrojPloce;
+QString opisGreske;
+QString path;
+
+void upisiRezultateUFajl(QString poruka)
+{
+    QTime vreme= QTime::currentTime();
+    int sati=vreme.hour();
+    int minuti=vreme.minute();
+    int sekunde = vreme.second();
+
+    QString tacnovreme = QString::number(sati) + ":" + QString::number(minuti)+":"+QString::number(sekunde);
+    QString ufajl = tacnovreme+","+imeOperatera+","+radniNalog+","+redniBrojPloce;
+
+    ufajl+=", "+poruka;
+
+    QFile qfile(path);
+    qfile.open(QIODevice::WriteOnly);
+    qfile.write(ufajl.toUtf8());
+    qfile.close();
+}
+
+QString napraviPorukuZaGresku(int pat,int kor,int red,int kol,int tip)
+{
+    QString poruka = "Javila se greska u toku sekvence " + QString::number(pat) + " i koraka " + QString::number(kor) +
+            " na diodi u redu " + QString::number(red) + " i koloni " + QString::number(kol) + ".";
+    if(tip==2)
+        poruka+="Greska je nastala jer bi dioda trebalo da svetli a uopste ne svetli.";
+    else if(tip==3)
+        poruka+="Greska je nastala jer dioda ne bi trebalo da svetli a svetli.";
+    else
+        poruka+="Greska je nastala jer dioda svetli drugacijom bojom od ocekivane.";
+
+    return poruka;
+}
 
 void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 {
@@ -73,7 +124,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
     uint8_t* pixptr2;
     pixptr = (uint8_t*)m.data;
     pixptr2 = (uint8_t*)bela.data;
-    int ocena[20][20];
+    int ocena[redovi][kolone];
     for(int i=0;i<redovi;i++)
         for(int j=0;j<kolone;j++)
             ocena[i][j] = 1;
@@ -84,8 +135,8 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
         {
             //qDebug() << i << " " << j;
 
-            int yc = matrica[i][j].first;
-            int xc = matrica[i][j].second;
+            int yc = koordinateCentara[i][j].first;
+            int xc = koordinateCentara[i][j].second;
             int ce = pixptr2[yc*bela.cols + xc];
 
             // qDebug() << yc << " " << xc;
@@ -93,22 +144,24 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             //if(ce) qDebug() << "upaljen";
             //else qDebug() << "nije upaljen";
 
-            if(!ce && trenutniRaspored[pat][kor][i][j]==0)
+            if(!ce && preracunatRaspored[pat]->getBoja(kor,i,j)==0)
             {
                //qDebug() << "ne svetli i ne treba da svetli";
                 continue;
             }
 
-            if(ce && trenutniRaspored[pat][kor][i][j]==0)
+            if(ce && preracunatRaspored[pat]->getBoja(kor,i,j)==0)
             {
                 //qDebug() << "svetli a ne treba da svetli";
+                upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,3));
                 ocena[i][j] = 3;
                 continue;
             }
 
-            if(!ce && trenutniRaspored[pat][kor][i][j]!=0)
+            if(!ce && preracunatRaspored[pat]->getBoja(kor,i,j)!=0)
             {
                 //qDebug() << "ne svetli a treba da svetli";
+                upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,2));
                 ocena[i][j] = 2;
                 continue;
             }
@@ -135,6 +188,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             if(cntoko < 1)
             {
                //qDebug() << "svetli drugom bojom";
+                upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,4));
                 ocena[i][j] = 4;
                 continue;
             }
@@ -166,35 +220,37 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
 extern void MainWindow::vrtiPaterne()
 {
-    //ui->progressBar->setValue(progress);
+    qDebug() << progress;
+
     cv::Mat mat;
     cv::Mat belaMatrica;
     cv::Mat hsvsh;
-    brojKorakaPoPaternu(8,8);
 
-    qDebug() << Vri << " " << Vrj << " " << Vrk;
-    ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(Vri)+", korak "+QString::number(Vrj)+", boja "+QString::number(Vrk));
+    qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
+
+    ui->progressBar->setValue(progress);
+    ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(boje[trenutnaBoja]));
     //QLabel *label4 = new QLabel;
-    //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(Vri)+", korak "+QString::number(Vrj)+", boja "+QString::number(Vrk));
+    //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(trenutnaBoja));
     inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
-    cvtColor(abe, hsvsh, CV_BGR2HSV);
-    inRange(hsvsh, Scalar(matricaBoja[2][(Vrk-1)*2],matricaBoja[1][(Vrk-1)*2],matricaBoja[0][(Vrk-1)*2] ), Scalar(matricaBoja[2][(Vrk-1)*2+1],matricaBoja[1][(Vrk-1)*2+1],matricaBoja[0][(Vrk-1)*2+1]), mat);
+    //cvtColor(abe, hsvsh, CV_BGR2HSV);
+    inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
     //imshow("Output2",mat);
     //cvtColor(mat, mat, CV_HSV2BGR);
     //imshow("maska",mat);
     //imshow("Output3",belaMatrica);
     //imshow("Output4",hsvsh);
-    proveraSlike(Vri,Vrj,mat,belaMatrica);
-    Vrj++;
-    if(Vrj==niz[Vri])
+    proveraSlike(trenutniPattern,trenutniKorak,mat,belaMatrica);
+    trenutniKorak++;
+    if(trenutniKorak==niz[trenutniPattern])
     {
-        Vrj=0;
-        Vrk++;
-        if(Vrk==7)
+        trenutniKorak=0;
+        trenutnaBoja++;
+        if(trenutnaBoja==7)
         {
             mTester.nextPattern();
-            Vri++;
-            Vrk=1;
+            trenutniPattern++;
+            trenutnaBoja=1;
         }
         else
         {
@@ -206,38 +262,40 @@ extern void MainWindow::vrtiPaterne()
         mTester.nextStep();
     }
 
-   /*if(Vrk==7)
+   /*if(trenutnaBoja==7)
     {
         qDebug () << "radi";
-        Vrk=1;
-        Vri++;
+        trenutnaBoja=1;
+        trenutniPattern++;
         mTester.nextPattern();
     }
-    if(Vri==7)
+    if(trenutniPattern==7)
     {
-        Vri=0;
+        trenutniPattern=0;
     }*/
 }
+
 void MainWindow::testiranjeAuto()
 {
-    for(int i=0;i<276;i++)
+    for(int i=0;i<ukupanBrojKoraka;i++)
     {
-        progress=(i*100)/276;
-        //ui->progressBar->setValue((i*100)/276);
+        progress=(i*100)/ukupanBrojKoraka;
+                    //ui->progressBar->setValue((i*100)/276);
         vrtiPaterne();
-        long long x = 2300000000;
+        long long x = 23000000000;
         while(x > 0) x--;
+                //QCoreApplication::postEvent(progresBar,QMouseEvent,10);
 
-        //qDebug()<<"testiranje auto";
-       // QFuture<void> future = QtConcurrent::run(this,MainWindow::vrtiPaterne);
-        //future<void> result(async(vrtiPaterne));
-        //result.get();
-        //auto result=async()
-        //long long x = (long long)1000000000;
+              //qDebug()<<"testiranje auto";
+             // QFuture<void> future = QtConcurrent::run(this,MainWindow::vrtiPaterne);
+            //future<void> result(async(vrtiPaterne));
+           //result.get();
+          //auto result=async()
+         //long long x = (long long)1000000000;
         //while(x > 0) x--;
     }
     //QFuture<void> future = QtConcurrent::run(this,MainWindow::vrtiPaterne);
-    qDebug() << "Sve ok fico";
+    upisiRezultateUFajl("sve je u redu");
 }
 
 
@@ -253,31 +311,6 @@ QString formatiraj(int x)
 {
     if(x<10) return "0"+QString::number(x);
     else return QString::number(x);
-}
-
-QString imeOperatera;
-QString radniNalog;
-QString redniBrojPloce;
-QString opisGreske;
-QString path;
-
-void upisiRezultateUFajl(int imaGresku,QString poruka,int korak)
-{
-    QTime vreme= QTime::currentTime();
-    int sati=vreme.hour();
-    int minuti=vreme.minute();
-    int sekunde = vreme.second();
-
-    QString tacnovreme = QString::number(sati) + ":" + QString::number(minuti)+":"+QString::number(sekunde);
-    QString ufajl = tacnovreme+","+imeOperatera+","+radniNalog+","+redniBrojPloce;
-
-    if(imaGresku) ufajl+=", greska na koraku "+ QString::number(korak)+ +","+poruka;
-    else ufajl+=", sve u redu";
-
-    QFile qfile(path);
-    qfile.open(QIODevice::WriteOnly);
-    qfile.write(ufajl.toUtf8());
-    qfile.close();
 }
 
 void napraviFajl()
@@ -301,8 +334,22 @@ void napraviFajl()
     qfile.close();
 }
 
+void citajBoje()
+{
+    QFile fajl("boje.ini");
+
+    //citaj iz fajla nekako
+    int x;
+    boje[0] = x;
+    boje[1] = x;
+    boje[2] = x;
+    boje[3] = x;
+    boje[4] = x;
+    boje[5] = x;
+}
 void MainWindow::on_startBtn_clicked()
 {
+    //start
     for(int i=0;i<6;i++)
     {
        mTester.prevPattern();
@@ -321,6 +368,7 @@ void MainWindow::on_startBtn_clicked()
     QString redovis=ui->redoviTxt->text();
     redovi=redovis.toInt();
     kolone=kolones.toInt();
+    brojKorakaPoPaternu(redovi,kolone);
     const quint16 fps = ui->fpsLineEdit->text().toUInt();
     m_frameTimer.setInterval(1000 / (fps ? fps : 1));
     m_frameTimer.start();
@@ -507,7 +555,7 @@ void MainWindow::preracunajPozicije()
     for(int i=0;i<redovi;i++)
         for(int j=0;j<kolone;j++)
             for(int k = 1;k<=6;k++)
-                trenutniRaspored[1][k-1][i][j] = k;
+                trenutniRaspored[1][k-1][i][j] = boje[k];
 
     qDebug() << "proso";
 
@@ -533,17 +581,17 @@ void MainWindow::preracunajPozicije()
           while(k1 < kolone/2 -1)
           {
                trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = trenutniRaspored[2][cnt][r3][k3] =
-                   trenutniRaspored[2][cnt][r4][k4] =k;
+                   trenutniRaspored[2][cnt][r4][k4] =boje[k];
                cnt++;
                k1++;
                k2++;
                k3++;
                k4++;
           }
-           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = boje[k];
            cnt++;
            k1++;
-           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
+           trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = boje[k];
            cnt++;
        }
 
@@ -555,15 +603,15 @@ void MainWindow::preracunajPozicije()
             k2 = kolone/2+1;
             while(k1 < kolone/2-1)
             {
-                trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = k;
+                trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = boje[k];
                 cnt++;
                 k1++;
                 k2++;
             }
-            trenutniRaspored[2][cnt][r1][k1] = k;
+            trenutniRaspored[2][cnt][r1][k1] = boje[k];
             cnt++;
             k1++;
-            trenutniRaspored[2][cnt][r1][k1] =  k;
+            trenutniRaspored[2][cnt][r1][k1] =  boje[k];
             cnt++;
        }
    }
@@ -582,16 +630,16 @@ void MainWindow::preracunajPozicije()
         {
             for(int i=0;i<redovi;i++)
             {
-                trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] = k;
+                trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] =boje[k];
             }
             k1++;
             k2++;
             cnt++;
         }
-        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = boje[k];
         cnt++;
         k1++;
-        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = k;
+        for(int i=0;i<redovi;i++) trenutniRaspored[3][cnt][i][k1]  = boje[k];
         cnt++;
     }
 
@@ -609,16 +657,16 @@ void MainWindow::preracunajPozicije()
         {
             for(int i = 0;i<kolone;i++)
             {
-                trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = k;
+                trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = boje[k];
             }
             r1++;
             r2++;
             cnt++;
         }
-        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = boje[k];
         cnt++;
         r1++;
-        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = k;
+        for(int i=0;i<kolone;i++) trenutniRaspored[4][cnt][r1][i] = boje[k];
         cnt++;
     }
 
@@ -640,7 +688,7 @@ void MainWindow::preracunajPozicije()
             int re;
             while(t >= 0)
             {
-                trenutniRaspored[5][cnt][t][ko] = k;
+                trenutniRaspored[5][cnt][t][ko] = boje[k];
                 t--;
                 ko++;
             }
@@ -648,7 +696,7 @@ void MainWindow::preracunajPozicije()
             ko = 0;
             while(t >= 0)
             {
-                trenutniRaspored[5][cnt][t][ko] = k;
+                trenutniRaspored[5][cnt][t][ko] = boje[k];
                 t--;
                 ko++;
             }
@@ -656,7 +704,7 @@ void MainWindow::preracunajPozicije()
             t = k1;
             while(t < kolone)
             {
-                trenutniRaspored[5][cnt][re][t] = k;
+                trenutniRaspored[5][cnt][re][t] = boje[k];
                 re--;
                 t++;
             }
@@ -674,7 +722,7 @@ void MainWindow::preracunajPozicije()
             int re;
             while(t >= 0)
             {
-                trenutniRaspored[5][cnt][t][ko] = k;
+                trenutniRaspored[5][cnt][t][ko] = boje[k];
                 t--;
                 ko++;
             }
@@ -682,7 +730,7 @@ void MainWindow::preracunajPozicije()
             t = k1;
             while(t < kolone)
             {
-                trenutniRaspored[5][cnt][re][t] = k;
+                trenutniRaspored[5][cnt][re][t] = boje[k];
                 re--;
                 t++;
             }
@@ -690,7 +738,7 @@ void MainWindow::preracunajPozicije()
             t = k2;
             while(t < kolone)
             {
-                trenutniRaspored[5][cnt][re][t] = k;
+                trenutniRaspored[5][cnt][re][t] = boje[k];
                 re--;
                 t++;
             }
@@ -720,7 +768,7 @@ void MainWindow::preracunajPozicije()
             temp = k1;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][re][temp] = k;
+                trenutniRaspored[6][cnt][re][temp] = boje[k];
                 temp--;
                 re--;
             }
@@ -728,7 +776,7 @@ void MainWindow::preracunajPozicije()
             temp = k2;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][re][temp] = k;
+                trenutniRaspored[6][cnt][re][temp] = boje[k];
                 temp--;
                 re--;
             }
@@ -736,7 +784,7 @@ void MainWindow::preracunajPozicije()
             ko = kolone-1;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][temp][ko] = k;
+                trenutniRaspored[6][cnt][temp][ko] = boje[k];
                 temp--;
                 ko--;
             }
@@ -754,7 +802,7 @@ void MainWindow::preracunajPozicije()
             temp = k1;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][re][temp] = k;
+                trenutniRaspored[6][cnt][re][temp] = boje[k];
                 temp--;
                 re--;
             }
@@ -762,7 +810,7 @@ void MainWindow::preracunajPozicije()
             ko = kolone-1;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][temp][ko] = k;
+                trenutniRaspored[6][cnt][temp][ko] = boje[k];
                 temp--;
                 ko--;
             }
@@ -770,7 +818,7 @@ void MainWindow::preracunajPozicije()
             ko = kolone-1;
             while(temp >= 0)
             {
-                trenutniRaspored[6][cnt][temp][ko] = k;
+                trenutniRaspored[6][cnt][temp][ko] = boje[k];
                 temp--;
                 ko--;
             }
@@ -785,7 +833,6 @@ void MainWindow::preracunajPozicije()
 
    // provera();
 }
-
 
 void MainWindow::on_obeleziBtn_clicked()
 {
@@ -849,14 +896,20 @@ void MainWindow::on_brightBtn_clicked()
 {
     const quint8 value = ui->brightLineEdit->text().toUInt();
     mTester.setBrightness(value);
-
-    //Pattern
 }
 
-//zastava
-//sve
-//4
-//vertikalne
-//horizontalne
-//sporedna
-//glavna
+
+void obeleziSve()
+{
+    obelezavanjecentara* ob = new obelezavanjecentara(redovi,kolone);
+    ob->obeleziCentre(abe,sens);
+    koordinateCentara = ob->matrica;
+}
+
+
+void preracunavanjePozicija()
+{
+    preracunavanjepozicija* ppoz = new preracunavanjepozicija(redovi,kolone,6);
+    ppoz->preracunajSvePozicije();
+    preracunatRaspored = ppoz->sviPatterni;
+}

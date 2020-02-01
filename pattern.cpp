@@ -6,6 +6,12 @@ class Pattern
 private:
 Korak **koraci;
 public:
+
+    Pattern()
+    {
+
+    }
+
     Pattern(int brKoraka,int redovi,int kolone)
     {
        koraci=new Korak*[brKoraka];
@@ -20,5 +26,9 @@ public:
         koraci[kor]->obelezi(red,kol,boja);
     }
 
+    int getBoja(int kor,int red,int kol)
+    {
+        return koraci[kor]->uzmiBoju(red,kol);
+    }
 
 };

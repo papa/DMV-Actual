@@ -6,6 +6,11 @@ private:
     int matrica[10][10];
 public:
 
+    Korak()
+    {
+
+    }
+
     Korak(int redovi,int kolone)
     {
        for(int i=0;i<redovi;i++)
@@ -15,6 +20,11 @@ public:
     void obelezi(int i,int j,int b)
     {
         matrica[i][j] = b;
+    }
+
+    int uzmiBoju(int red,int kol)
+    {
+        return matrica[red][kol];
     }
 
 };

@@ -1,20 +1,9 @@
 #include "mainwindow.h"
 
-class obelezavanjeCentara
+class obelezavanjecentara
 {
 
 private:
-
-    int brkomp;
-    int redovi;
-    int kolone;
-    int **centri;
-    pair<int,int> **matrica;
-    uint8_t* pixelPtr;
-    int iMin;
-    int iMax;
-    int jMin;
-    int jMax;
 
     void obelezavanje(int i,int j,cv::Mat m_mat)
     {
@@ -102,7 +91,18 @@ private:
 
 public:
 
-    obelezavanjeCentara(int r,int k)
+    int brkomp;
+    int redovi;
+    int kolone;
+    int **centri;
+    pair<int,int> **matrica;
+    uint8_t* pixelPtr;
+    int iMin;
+    int iMax;
+    int jMin;
+    int jMax;
+
+    obelezavanjecentara(int r,int k)
     {
         redovi = r;
         kolone = k;
@@ -134,7 +134,7 @@ public:
                       jMax=j;
                       jMin=j;
                       obelezavanje(i,j,m_mat);
-                      if(brkomp <= 20) continue;
+                      if(brkomp <= 5) continue;
                       centri[c][1]=(jMin+jMax)/2;
                       centri[c][0]=(iMin+iMax)/2;
                       qDebug() << centri[c][0] << " " << centri[c][1] << "\n";

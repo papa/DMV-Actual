@@ -29,7 +29,7 @@
        <item>
         <widget class="QLineEdit" name="sourceLineEdit">
          <property name="text">
-          <string>rtsp://192.168.0.235:8080/video/h264</string>
+          <string>rtsp://192.168.0.114:8080/video/h264</string>
          </property>
         </widget>
        </item>
