@@ -31,14 +31,20 @@ SOURCES += \
     obelezavanjecentara.cpp \
     preracunavanjepozicija.cpp \
     pattern.cpp \
-    korak.cpp
+    korak.cpp \
+    prijava.cpp \
+    boja.cpp
 
 HEADERS += \
         mainwindow.h \
-    dmvtestercommunicator.h
+    dmvtestercommunicator.h \
+    prijava.h \
+    boja.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    prijava.ui \
+    boja.ui
 
 # OpenCV includes
 INCLUDEPATH += D:\opencv\build\include

@@ -8,6 +8,7 @@
 #include "future"
 #include "obelezavanjecentara.cpp"
 #include "preracunavanjepozicija.cpp"
+#include "prijava.h"
 
 //zastava
 //sve
@@ -53,13 +54,22 @@ MainWindow::MainWindow(QWidget* parent)
     m_frameTimer.setSingleShot(false);
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
+    //otvori novi prozor
+    Prijava *prijava = new Prijava();
+    prijava->show();
+    prijava->postaviMW(this);
+    prijava->setFocus();
+    this->setEnabled(false);
 }
 int redovi,kolone;
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
+void MainWindow::vratiBoje(QString boje)
+{
+    qDebug()<<boje;
+}
 void MainWindow::brojKorakaPoPaternu(int re,int ko)
 {
     niz[0]=niz[1]=1;
@@ -216,7 +226,6 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
     qDebug() << "\n";
 
 }
-
 
 extern void MainWindow::vrtiPaterne()
 {

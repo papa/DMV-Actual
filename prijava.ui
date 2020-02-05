@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Prijava</class>
+ <widget class="QDialog" name="Prijava">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>425</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ime testera:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="redniBrojPloce">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>80</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Redni broj ploce:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="imeTestera">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>20</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Radni nalog:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="radniNalog_2">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>50</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="tipPloce">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>72</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>20</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Tip ploce:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="OK">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>260</y>
+     <width>80</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja2">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja3">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja4">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja5">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="boja6">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>160</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

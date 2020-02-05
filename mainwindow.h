@@ -63,7 +63,6 @@ private slots:
     void obelezavanje(int i,int j);
     void testiranjeAuto();
     //void called_from_async();
-
 private:
     DMVTesterCommunicator mTester;
 
@@ -74,6 +73,9 @@ private:
 	QTimer           m_frameTimer;
 	cv::VideoCapture m_videoCapture;
 	cv::Mat          m_mat;
+
+public:
+    void vratiBoje(QString boje);
 };
 
 #endif // MAINWINDOW_H
