@@ -9,7 +9,7 @@
 #include "obelezavanjecentara.cpp"
 #include "preracunavanjepozicija.cpp"
 #include "prijava.h"
-
+#include "QMessageBox"
 //zastava
 //sve
 //4
@@ -43,32 +43,77 @@ int matricaBoja[3][12]={
     {150,180,60,93,94,130,0,180,10,25,0,20}
 };*/
 
+Prijava *podesavanja;
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->fpsLineEdit   ->setValidator(m_fpsIntV);
-    ui->brightLineEdit->setValidator(m_brtIntV);
     m_frameTimer.setTimerType(Qt::TimerType::PreciseTimer);
     m_frameTimer.setSingleShot(false);
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
-    //otvori novi prozor
-    Prijava *prijava = new Prijava();
-    prijava->show();
-    prijava->postaviMW(this);
-    prijava->setFocus();
     this->setEnabled(false);
+    //this->close();
+    //otvori novi prozor
+    //this->setFocusPolicy(false);
+    //prijava = new Prijava();
+    //prijava->show();
+    //close();
+    podesavanja->postaviMW(this);
+    //close();
+    //otvori();
 }
+
+/*void MainWindow::podesavanjaRef(Prijava *prijava)
+{
+
+    podesavanja=prijava;
+}*/
+
 int redovi,kolone;
 MainWindow::~MainWindow()
 {
+    //hide();
     delete ui;
 }
-void MainWindow::vratiBoje(QString boje)
+
+void MainWindow::on_podesavanjaBtn_clicked()
 {
-    qDebug()<<boje;
+
+
+    podesavanja->show();
+}
+void MainWindow::vratiBoje(QString bojee)
+{
+    qDebug()<<bojee;
+    /*qDebug()<<QString::fromStdString(prijava->sourceString);
+    if (m_videoCapture.isOpened()) m_videoCapture.release();
+    if (!m_videoCapture.open(prijava->sourceString) || !m_videoCapture.isOpened())
+    {
+        this->setEnabled(false);
+        QMessageBox msgBox;
+        msgBox.setInformativeText("Source error");
+        msgBox.setStandardButtons(QMessageBox::Save);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        //QMessageBox msgBox(QMessageBox::Information,"Error","Source error",QMessageBox::Ok);
+       // QObject::connect(msgBox.button(QMessageBox::Ok),&QAbstractButton::pressed,[](){msgBox.close();prijava->setVisible(true);qDebug() << "Set visible true";});
+        int ret = msgBox.exec();
+        switch(ret)
+        {
+            case QMessageBox::Save:
+             prijava->setVisible(true);
+             msgBox.close();
+            break;
+        }
+        //msgBox.close();
+        return;
+    }
+    else
+    {
+
+    }*/
 }
 void MainWindow::brojKorakaPoPaternu(int re,int ko)
 {
@@ -244,11 +289,6 @@ extern void MainWindow::vrtiPaterne()
     inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
     //cvtColor(abe, hsvsh, CV_BGR2HSV);
     inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
-    //imshow("Output2",mat);
-    //cvtColor(mat, mat, CV_HSV2BGR);
-    //imshow("maska",mat);
-    //imshow("Output3",belaMatrica);
-    //imshow("Output4",hsvsh);
     proveraSlike(trenutniPattern,trenutniKorak,mat,belaMatrica);
     trenutniKorak++;
     if(trenutniKorak==niz[trenutniPattern])
@@ -365,31 +405,14 @@ void MainWindow::on_startBtn_clicked()
        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 
-    if (m_videoCapture.isOpened()) m_videoCapture.release();
 
-    if (   !m_videoCapture.open(ui->sourceLineEdit->text().toUtf8().constData())
-        || !m_videoCapture.isOpened())
-    {
-        qDebug() << "SOURCE ERROR";
-        return;
-    }
-    QString kolones=ui->koloneTxt->text();
-    QString redovis=ui->redoviTxt->text();
-    redovi=redovis.toInt();
-    kolone=kolones.toInt();
     brojKorakaPoPaternu(redovi,kolone);
-    const quint16 fps = ui->fpsLineEdit->text().toUInt();
-    m_frameTimer.setInterval(1000 / (fps ? fps : 1));
+
+   // m_frameTimer.setInterval(1000 / (main.prijava->fps ? main.prijava->fps : 1));
     m_frameTimer.start();
 
     napraviFajl();
 
-    imeOperatera=ui->imeTestera->text();
-   // qDebug() << imeOperatera;
-    radniNalog=ui->radniNalog->text();
-    //qDebug() << radniNalog;
-    redniBrojPloce=ui->redniBrojPloce->text();
-    //qDebug() << redniBrojPloce;
 }
 
 uint8_t* pixelPtr;

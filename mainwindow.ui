@@ -7,139 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>609</width>
-    <height>363</height>
+    <height>378</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>591</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLineEdit" name="sourceLineEdit">
-         <property name="text">
-          <string>rtsp://192.168.0.114:8080/video/h264</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="sourceLabel">
-         <property name="text">
-          <string>Source:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="fpsLabel">
-           <property name="text">
-            <string>FPS:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="fpsLineEdit">
-           <property name="text">
-            <string>25</string>
-           </property>
-           <property name="maxLength">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="fpsLabel_2">
-         <property name="text">
-          <string>Kolone:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="koloneTxt">
-         <property name="text">
-          <string>8</string>
-         </property>
-         <property name="maxLength">
-          <number>4</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="fpsLabel_3">
-         <property name="text">
-          <string>Redovi:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="redoviTxt">
-         <property name="text">
-          <string>8</string>
-         </property>
-         <property name="maxLength">
-          <number>4</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="startBtn">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="stopBtn">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Stop</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGroupBox" name="group">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
+      <y>10</y>
       <width>591</width>
       <height>141</height>
      </rect>
     </property>
     <property name="title">
-     <string>Device commands</string>
+     <string>Komande</string>
     </property>
     <widget class="QPushButton" name="enableVKBtn">
      <property name="geometry">
@@ -340,80 +225,11 @@
      </property>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="imeTestera">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>10</y>
-      <width>113</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="radniNalog">
-    <property name="geometry">
-     <rect>
-      <x>265</x>
-      <y>10</y>
-      <width>113</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ime testera:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>10</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Radni nalog:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>10</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Redni broj ploce:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="redniBrojPloce">
-    <property name="geometry">
-     <rect>
-      <x>480</x>
-      <y>10</y>
-      <width>113</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>280</y>
+      <y>240</y>
       <width>551</width>
       <height>23</height>
      </rect>
@@ -426,13 +242,26 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>260</y>
+      <y>220</y>
       <width>231</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
      <string>Loop 0, sekvenca 0, korak 0, boja 0</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="podesavanjaBtn">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>180</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Podesavanja</string>
     </property>
    </widget>
   </widget>

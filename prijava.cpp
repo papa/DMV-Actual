@@ -8,10 +8,14 @@
 
 MainWindow *mw;
 QPushButton *trenutni;
+int ind;
 void Prijava::postaviMW(MainWindow *m)
 {
     mw=m;
+   // m->close();
 }
+
+int bojee[7];
 void Prijava::vrati(int x)
 {
     if(x==1)
@@ -38,15 +42,29 @@ void Prijava::vrati(int x)
     {
         trenutni->setStyleSheet("background-color:orange");
     }
+
+    bojee[ind-1] = x;
 }
+
 Prijava::Prijava(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Prijava)
 {
+
+    this->setFocus();
     ui->setupUi(this);
+    ui->fpsLineEdit->setValidator(m_fpsIntV);
+    //QTimer::singleShot(0, ui, SLOT(setFocus()));
+    //ui->brightLineEdit->setValidator(m_brtIntV);
     ui->tipPloce->addItem("Jednobojna");
     ui->tipPloce->addItem("Dvobojna");
     ui->tipPloce->addItem("Visebojna");
+    bojee[0]=1;
+    bojee[1]=2;
+    bojee[2]=3;
+    bojee[3]=4;
+    bojee[4]=5;
+    bojee[5]=6;
     ui->boja1->setStyleSheet("background-color:red");
     ui->boja2->setStyleSheet("background-color:green");
     ui->boja3->setStyleSheet("background-color:blue");
@@ -85,7 +103,14 @@ void Prijava::on_tipPloce_currentIndexChanged()
 void Prijava::on_OK_clicked()
 {
     qDebug()<<"sve ok fico";
-    if(ui->imeTestera->text().size()==0||ui->radniNalog_2->text().size()==0||ui->redniBrojPloce->text().size()==0)
+    sourceString = ui->sourceLineEdit->text().toUtf8().constData();
+
+    QString kolones=ui->koloneTxt->text();
+    QString redovis=ui->redoviTxt->text();
+    int redovi=redovis.toInt();
+    int kolone=kolones.toInt();
+
+    if(ui->imeTestera->text().size()==0||ui->radniNalog->text().size()==0||ui->redniBrojPloce->text().size()==0 || redovi==0 || kolone == 0)
     {
         QMessageBox mesedz;
         mesedz.setText("Niste uneli sve parametre potrebne za testiranje te Vas molimo da ih unesete u najkracem roku i pokusate ponovo, hvala :)");
@@ -93,11 +118,33 @@ void Prijava::on_OK_clicked()
     }
     else
     {
-        //this->hide();
-        mw->vratiBoje("AAAAAAAAAAAAAAAAAAAAAAAAAA");
-        //todo stavi boje ovde, ocitaj iz ui->tipPloce koji je tip i onda parsuj prvih n boja u obliku 1 2 3 4 5 6
+
+         this->setVisible(false);
+
+        if(ui->tipPloce->currentIndex()==0)
+        {
+            mw->vratiBoje(QString::number(bojee[0]));
+        }
+        else if(ui->tipPloce->currentIndex()==1)
+        {
+            mw->vratiBoje(QString::number(bojee[0])+QString::number(bojee[1]));
+        }
+        else
+        {
+            mw->vratiBoje(QString::number(bojee[0])+QString::number(bojee[1])+QString::number(bojee[2])+QString::number(bojee[3])+QString::number(bojee[4])+QString::number(bojee[5]));
+        }
+
+        imeOperatera=ui->imeTestera->text();
+        qDebug() << imeOperatera;
+        radniNalog=ui->radniNalog->text();
+        qDebug() << radniNalog;
+        redniBrojPloce=ui->redniBrojPloce->text();
+        qDebug() << redniBrojPloce;
+
+
+        fps = ui->fpsLineEdit->text().toUInt();
+
         mw->setDisabled(false);
-        this->destroy();
     }
 }
 void Prijava::on_boja1_clicked()
@@ -106,6 +153,7 @@ void Prijava::on_boja1_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja1;
+    ind = 1;
 }
 void Prijava::on_boja2_clicked()
 {
@@ -113,6 +161,7 @@ void Prijava::on_boja2_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja2;
+    ind = 2;
 }
 void Prijava::on_boja3_clicked()
 {
@@ -120,6 +169,7 @@ void Prijava::on_boja3_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja3;
+    ind = 3;
 }
 void Prijava::on_boja4_clicked()
 {
@@ -127,6 +177,7 @@ void Prijava::on_boja4_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja4;
+    ind =4;
 }
 void Prijava::on_boja5_clicked()
 {
@@ -134,6 +185,7 @@ void Prijava::on_boja5_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja5;
+    ind = 5;
 }
 void Prijava::on_boja6_clicked()
 {
@@ -141,6 +193,7 @@ void Prijava::on_boja6_clicked()
     birac->show();
     birac->setujPrijavu(this);
     trenutni=ui->boja6;
+    ind = 6;
 }
 Prijava::~Prijava()
 {

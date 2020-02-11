@@ -28,11 +28,14 @@ public:
 	explicit MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
+
 private slots:
 	void onFrameTimer();
 
 	void on_startBtn_clicked();
 	void on_stopBtn_clicked();
+
+    void on_podesavanjaBtn_clicked();
 
     void on_enableVKBtn_clicked()  { mTester.enableVK(); }
     void on_disableVKBtn_clicked() { mTester.enableVK(); }
@@ -67,15 +70,15 @@ private:
     DMVTesterCommunicator mTester;
 
 	Ui::MainWindow* ui;
-	QIntValidator*  m_fpsIntV = new QIntValidator(1, 1000, this);
-	QIntValidator*  m_brtIntV = new QIntValidator(1, 100 , this);
+
 
 	QTimer           m_frameTimer;
-	cv::VideoCapture m_videoCapture;
+    cv::VideoCapture m_videoCapture;
 	cv::Mat          m_mat;
 
 public:
-    void vratiBoje(QString boje);
+    void vratiBoje(QString bojee);
+    //void podesavanjeRef(Prijava *prijava);
 };
 
 #endif // MAINWINDOW_H
