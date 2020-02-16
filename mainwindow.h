@@ -9,9 +9,6 @@
 #include "dmvtestercommunicator.h"
 #include <QDateTime>
 #include <QFile>
-#include <prijava.h>
-#include <podaci.h>
-//#include <prijava.cpp>
 
 #include "opencv2/opencv.hpp"
 
@@ -53,14 +50,10 @@ private slots:
     void on_prevStepBtn_clicked() { mTester.prevStep(); }
     void on_nextStepBtn_clicked() { mTester.nextStep(); }
 
-    void citajBoje();
-
     void on_prevPatternBtn_clicked() { mTester.prevPattern(); }
     void on_nextPatternBtn_clicked() { mTester.nextPattern(); }
 
     void on_praviMaskuBtn_clicked();
-
-
 
 	void on_brightBtn_clicked();
     void preracunajPozicije();
@@ -77,7 +70,6 @@ private:
     DMVTesterCommunicator mTester;
 
 	Ui::MainWindow* ui;
-    Prijava *prijav;
 
 
 	QTimer           m_frameTimer;
@@ -86,8 +78,6 @@ private:
 
 public:
     void vratiBoje(QString bojee);
-    Prijava *prijavaaaaaa;
-    podaci *podaciSave;
     //void podesavanjeRef(Prijava *prijava);
 };
 

@@ -2,10 +2,7 @@
 #define PRIJAVA_H
 
 #include <QDialog>
-#include <QIntValidator>
-#include <podaci.h>
-//#include <mainwindow.h>
-//#include "ui_mainwindow.h"
+#include <mainwindow.h>
 
 namespace Ui {
 class Prijava;
@@ -26,24 +23,14 @@ private slots:
     void on_tipPloce_currentIndexChanged();
 
 public:
-    explicit Prijava(QWidget *parent);
+    explicit Prijava(QWidget *parent = 0);
     void vrati(int x);
-    void setujPodaci(podaci *p);
-    void setujPodatkeGlobal();
-    void izabranaBoja(int ii);
-    podaci *pod;
-    //void postaviMW(MainWindow *mw);
+    void postaviMW(MainWindow *m);
     QString imeOperatera;
     QString radniNalog;
     QString redniBrojPloce;
     quint16 fps;
-    int kolone;
-    int redovi;
-    int brojBoja;
-    QString sourceString;
-    QString bojePrenos;
-    void setujPodatke(QString ime, QString radniNalog,QString sors,quint16 fps, QString rbploce,int kolones,int redovis, QString boje, int brojboja);
-    //MainWindow ww;
+    string sourceString;
     ~Prijava();
 
 

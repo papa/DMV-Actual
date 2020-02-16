@@ -33,15 +33,13 @@ SOURCES += \
     pattern.cpp \
     korak.cpp \
     prijava.cpp \
-    boja.cpp \
-    podaci.cpp
+    boja.cpp
 
 HEADERS += \
         mainwindow.h \
     dmvtestercommunicator.h \
     prijava.h \
-    boja.h \
-    podaci.h
+    boja.h
 
 FORMS += \
         mainwindow.ui \
