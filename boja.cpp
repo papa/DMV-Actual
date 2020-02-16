@@ -1,7 +1,7 @@
 #include "boja.h"
 #include "ui_boja.h"
 #include "prijava.h"
-
+#include <QDebug>
 
 Prijava *pp;
 boja::boja(QWidget *parent) :
@@ -23,32 +23,32 @@ void boja::setujPrijavu(Prijava *p)
 void boja::on_boja1_clicked()
 {
     pp->vrati(1);
-    this->destroy();
+    close();
 }
 void boja::on_boja2_clicked()
 {
     pp->vrati(2);
-    this->destroy();
+    close();
 }
 void boja::on_boja3_clicked()
 {
     pp->vrati(3);
-    this->destroy();
+    close();
 }
 void boja::on_boja4_clicked()
 {
     pp->vrati(4);
-    this->destroy();
+    close();
 }
 void boja::on_boja5_clicked()
 {
     pp->vrati(5);
-    this->destroy();
+    close();
 }
 void boja::on_boja6_clicked()
 {
     pp->vrati(6);
-    this->destroy();
+    close();
 }
 boja::~boja()
 {

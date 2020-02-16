@@ -31,7 +31,8 @@ int centri[256][2];
 pair<int,int> matrica[20][20];
 int niz[7];
 int progress=0;
-int boje[6];
+int ukupanBrojBoja;
+int boje[7];
 int matricaBoja[3][12]={
     {230,255,100,190,80,170,200,255,170,255,220,255},
     {130,230,200,255,165,255,200,255,140,225,140,205},
@@ -45,6 +46,8 @@ int matricaBoja[3][12]={
 
 Prijava *podesavanja;
 
+
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -54,36 +57,48 @@ MainWindow::MainWindow(QWidget* parent)
     m_frameTimer.setSingleShot(false);
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
-    this->setEnabled(false);
-    //this->close();
-    //otvori novi prozor
-    //this->setFocusPolicy(false);
-    //prijava = new Prijava();
-    //prijava->show();
-    //close();
-    podesavanja->postaviMW(this);
-    //close();
-    //otvori();
+    podaciSave=new podaci();
+
+    //hide();
+    //prijav = new Prijava(this);
+    //prijav->show();
+    //prijav->setujPodaci(podaciSave);
+
+    this->setVisible(false);
+    /*Prijava pr(this);
+    pr.setujPodaci(podaciSave);
+    pr.setujPodatkeGlobal();
+    //pr.setModal(true);
+    pr.exec();*/
+    Prijava *prijava=new Prijava(this);
+    prijava->setujPodaci(podaciSave);
+    prijava->setujPodatkeGlobal();
+    prijava->show();
+    this->setVisible(false);
+
+    //Prijava pr;
+    //pr.setModal(true);
+    //pr.exec();
 }
-
-/*void MainWindow::podesavanjaRef(Prijava *prijava)
-{
-
-    podesavanja=prijava;
-}*/
 
 int redovi,kolone;
 MainWindow::~MainWindow()
 {
-    //hide();
     delete ui;
 }
 
 void MainWindow::on_podesavanjaBtn_clicked()
 {
-
-
-    podesavanja->show();
+    this->setVisible(false);
+    /*Prijava pr(this);
+    pr.setujPodaci(podaciSave);
+    pr.setujPodatkeGlobal();
+    //pr.setModal(true);
+    pr.exec();*/
+    Prijava *prijava=new Prijava(this);
+    prijava->setujPodaci(podaciSave);
+    prijava->setujPodatkeGlobal();
+    prijava->show();
 }
 void MainWindow::vratiBoje(QString bojee)
 {
@@ -383,18 +398,11 @@ void napraviFajl()
     qfile.close();
 }
 
-void citajBoje()
+void MainWindow::citajBoje()
 {
-    QFile fajl("boje.ini");
-
-    //citaj iz fajla nekako
-    int x;
-    boje[0] = x;
-    boje[1] = x;
-    boje[2] = x;
-    boje[3] = x;
-    boje[4] = x;
-    boje[5] = x;
+    QString bb =  podaciSave->bojePrenos;
+    qDebug() << bb;
+    for(int i=1;i<=ukupanBrojBoja;i++) boje[i] = bb.mid(i-1,i-1).toInt();
 }
 void MainWindow::on_startBtn_clicked()
 {
