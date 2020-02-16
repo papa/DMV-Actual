@@ -2,17 +2,11 @@
 #include "prijava.h"
 #include <QApplication>
 
-static Prijava *prijava;
-
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
+    QApplication a(argc, argv);
     MainWindow w;
-    w.show();
-
-    prijava = new Prijava();
-    //w.podesavanjeRef(prijava);
-    prijava->show();
+    //w.show();
 
 	int ret = a.exec();
 
@@ -20,3 +14,4 @@ int main(int argc, char *argv[])
     //w.close();
 	return ret;
 }
+
