@@ -147,11 +147,13 @@ public:
          {
              pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
          }
+         MainWindow::preracunavanjePozicija();
         // preracunajPozicije();
+
 
             //imshow("Output3",m_mat);
 
-             //QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+        QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
     }
 
 };

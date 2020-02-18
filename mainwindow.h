@@ -60,7 +60,8 @@ private slots:
 
     void on_praviMaskuBtn_clicked();
 
-
+    void obeleziSve();
+    void preracunavanjePozicija();
 
 	void on_brightBtn_clicked();
     void preracunajPozicije();
