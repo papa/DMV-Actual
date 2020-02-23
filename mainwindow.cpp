@@ -58,7 +58,6 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
     podaciSave=new podaci();
-
     //hide();
     //prijav = new Prijava(this);
     //prijav->show();
@@ -447,8 +446,8 @@ void MainWindow::obelezavanje(int i,int j)
 }
 
 
-
-
+//ove dve funkcije imamo u obelezevanjecentara.cpp, komotno mogu da se obrisu, al za svaki slucaj neka ih u komentaru
+/*
 void napraviMatricu()
 {
     for(int i = 0;i<redovi;i++)
@@ -476,10 +475,12 @@ void napraviMatricu()
         }
         qDebug() << "\n";
     }
-    qDebug() << "\n";*/
+    qDebug() << "\n";
 
 }
+*/
 
+/*
 void odrediDimenzije(int nm)
 {
     if(nm<kolone*redovi)
@@ -509,10 +510,10 @@ void odrediDimenzije(int nm)
             redovi = 16;
             kolone = 8;
         }
-    }*/
+    }
     napraviMatricu();
 }
-
+*/
 
 void stampa(int p,int c)
 {
@@ -561,7 +562,9 @@ void provera()
         stampa(6,c);
 }
 
-void MainWindow::preracunajPozicije()
+//ovo imamo u preracunavanjepozicija.cpp
+
+/*void MainWindow::preracunajPozicije()
 {
     //zastava
     //sve
@@ -873,9 +876,9 @@ void MainWindow::preracunajPozicije()
 
    // provera();
 }
-
+*/
 void MainWindow::on_obeleziBtn_clicked()
-{
+{ /*
     //todo
     inRange(abe, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
    // imshow("Output4",m_mat);
@@ -908,10 +911,12 @@ void MainWindow::on_obeleziBtn_clicked()
     {
         pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
     }
-    preracunajPozicije();
+    //preracunajPozicije();
+    preracunavanjepozicija();
     imshow("Output3",m_mat);
 
-    QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+    QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);*/
+    obeleziSve();
 }
 
 void MainWindow::on_stopBtn_clicked()
@@ -939,7 +944,7 @@ void MainWindow::on_brightBtn_clicked()
 }
 
 
-void obeleziSve()
+void MainWindow::obeleziSve()
 {
     obelezavanjecentara* ob = new obelezavanjecentara(redovi,kolone);
     ob->obeleziCentre(abe,sens);
@@ -947,9 +952,11 @@ void obeleziSve()
 }
 
 
-void preracunavanjePozicija()
+void MainWindow::preracunavanjePozicija()
 {
     preracunavanjepozicija* ppoz = new preracunavanjepozicija(redovi,kolone,6);
     ppoz->preracunajSvePozicije();
     preracunatRaspored = ppoz->sviPatterni;
+    ppoz->postavljanjeGranice(podaciSave->brojBoja);
+    ppoz->getterStringaBoje(podaciSave->bojePrenos);
 }

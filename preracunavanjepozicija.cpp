@@ -8,20 +8,32 @@ private:
  int redovi;
  int kolone;
  int cnt;
+ int granica;
+ QString stringBoja;
+
+ void postavljanjeGranice(int brojBoja)
+ {
+     granica=brojBoja;
+ }
+
+ void getterStringaBoje(QString boje)
+ {
+     stringBoja=boje;
+ }
 
  void prviPattern()
  {
      for(int i=0;i<redovi;i++)
              for(int j=0;j<kolone;j++)
-                 for(int k = 1;k<=6;k++)
-                     sviPatterni[1]->postaviPoljeUMatrici(k-1,i,j,k);
+                 for(int k = 1;k<=granica;k++)
+                     sviPatterni[1]->postaviPoljeUMatrici(k-1,i,j,stringBoja[k-1]);
  }
 
  void drugiPattern()
  {
      cnt = 0;
 
-        for(int k=1;k<=6;k++)
+        for(int k=1;k<=granica;k++)
         {
             int r1,r2,r3,r4;
             int k1,k2,k3,k4;
@@ -38,23 +50,23 @@ private:
                k4 = kolone/2+1;
                while(k1 < kolone/2 -1)
                {
-                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
-                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r2,k2,k);
-                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k3,k);
-                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r4,k4,k);
+                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
+                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r2,k2,stringBoja[k-1]);
+                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k3,stringBoja[k-1]);
+                    sviPatterni[2]->postaviPoljeUMatrici(cnt,r4,k4,stringBoja[k-1]);
                     cnt++;
                     k1++;
                     k2++;
                     k3++;
                     k4++;
                }
-                sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
-                sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k1,k);
+                sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
+                sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k1,stringBoja[k-1]);
                 //trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
                 cnt++;
                 k1++;
-                sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
-                sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k1,k);
+                sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
+                sviPatterni[2]->postaviPoljeUMatrici(cnt,r3,k1,stringBoja[k-1]);
                 //trenutniRaspored[2][cnt][r1][k1] = trenutniRaspored[2][cnt][r3][k1] = k;
                 cnt++;
             }
@@ -67,18 +79,18 @@ private:
                  k2 = kolone/2+1;
                  while(k1 < kolone/2-1)
                  {
-                      sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
-                      sviPatterni[2]->postaviPoljeUMatrici(cnt,r2,k2,k);
+                      sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
+                      sviPatterni[2]->postaviPoljeUMatrici(cnt,r2,k2,stringBoja[k-1]);
                      //trenutniRaspored[2][cnt][r1][k1] =  trenutniRaspored[2][cnt][r2][k2] = k;
                      cnt++;
                      k1++;
                      k2++;
                  }
-                 sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
+                 sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
                  //trenutniRaspored[2][cnt][r1][k1] = k;
                  cnt++;
                  k1++;
-                 sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,k);
+                 sviPatterni[2]->postaviPoljeUMatrici(cnt,r1,k1,stringBoja[k-1]);
                  //trenutniRaspored[2][cnt][r1][k1] =  k;
                  cnt++;
             }
@@ -88,7 +100,7 @@ private:
  void treciPattern()
  {
      cnt = 0;
-     for(int k=1;k<=6;k++)
+     for(int k=1;k<=granica;k++)
      {
          int k1 = 0;
          int k2 = kolone/2+1;
@@ -96,18 +108,18 @@ private:
          {
              for(int i=0;i<redovi;i++)
              {
-                 sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,k);
-                 sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k2,k);
+                 sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,stringBoja[k-1]);
+                 sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k2,stringBoja[k-1]);
                  //trenutniRaspored[3][cnt][i][k1] = trenutniRaspored[3][cnt][i][k2] = k;
              }
              k1++;
              k2++;
              cnt++;
           }
-          for(int i=0;i<redovi;i++)  sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,k);
+          for(int i=0;i<redovi;i++)  sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,stringBoja[k-1]);
           cnt++;
           k1++;
-          for(int i=0;i<redovi;i++) sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,k);
+          for(int i=0;i<redovi;i++) sviPatterni[3]->postaviPoljeUMatrici(cnt,i,k1,stringBoja[k-1]);
           cnt++;
      }
  }
@@ -115,7 +127,7 @@ private:
  void cetvrtiPattern()
  {
      cnt = 0;
-         for(int k=1;k<=6;k++)
+         for(int k=1;k<=granica;k++)
          {
              int r1 = 0;
              int r2 = redovi/2+1;
@@ -123,18 +135,18 @@ private:
              {
                  for(int i = 0;i<kolone;i++)
                  {
-                     sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,k);
-                     sviPatterni[4]->postaviPoljeUMatrici(cnt,r2,i,k);
+                     sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,stringBoja[k-1]);
+                     sviPatterni[4]->postaviPoljeUMatrici(cnt,r2,i,stringBoja[k-1]);
                      //trenutniRaspored[4][cnt][r1][i] = trenutniRaspored[4][cnt][r2][i] = k;
                  }
                  r1++;
                  r2++;
                  cnt++;
              }
-             for(int i=0;i<kolone;i++) sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,k);
+             for(int i=0;i<kolone;i++) sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,stringBoja[k-1]);
              cnt++;
              r1++;
-             for(int i=0;i<kolone;i++) sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,k);
+             for(int i=0;i<kolone;i++) sviPatterni[4]->postaviPoljeUMatrici(cnt,r1,i,stringBoja[k-1]);
              cnt++;
          }
 
@@ -143,7 +155,7 @@ private:
  void petiPattern()
  {
      cnt = 0;
-         for(int k=1;k<=6;k++)
+         for(int k=1;k<=granica;k++)
          {
 
              int r1 = 0;
@@ -156,7 +168,7 @@ private:
                  int re;
                  while(t >= 0)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,stringBoja[k-1]);
                      //trenutniRaspored[5][cnt][t][ko] = k;
                      t--;
                      ko++;
@@ -165,7 +177,7 @@ private:
                  ko = 0;
                  while(t >= 0)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,stringBoja[k-1]);
                      //trenutniRaspored[5][cnt][t][ko] = k;
                      t--;
                      ko++;
@@ -174,7 +186,7 @@ private:
                  t = k1;
                  while(t < kolone)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,stringBoja[k-1]);
                     // trenutniRaspored[5][cnt][re][t] = k;
                      re--;
                      t++;
@@ -193,7 +205,7 @@ private:
                  int re;
                  while(t >= 0)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,t,ko,stringBoja[k-1]);
                      //trenutniRaspored[5][cnt][t][ko] = k;
                      t--;
                      ko++;
@@ -202,7 +214,7 @@ private:
                  t = k1;
                  while(t < kolone)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,stringBoja[k-1]);
                     // trenutniRaspored[5][cnt][re][t] = k;
                      re--;
                      t++;
@@ -211,7 +223,7 @@ private:
                  t = k2;
                  while(t < kolone)
                  {
-                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,k);
+                     sviPatterni[5]->postaviPoljeUMatrici(cnt,re,t,stringBoja[k-1]);
                      //trenutniRaspored[5][cnt][re][t] = k;
                      re--;
                      t++;
@@ -241,7 +253,7 @@ private:
              temp = k1;
              while(temp >= 0)
              {
-                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,stringBoja[k-1]);
                 // trenutniRaspored[6][cnt][re][temp] = k;
                  temp--;
                  re--;
@@ -250,7 +262,7 @@ private:
              temp = k2;
              while(temp >= 0)
              {
-                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,stringBoja[k-1]);
                  temp--;
                  re--;
              }
@@ -258,7 +270,7 @@ private:
              ko = kolone-1;
              while(temp >= 0)
              {
-                 sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                 sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,stringBoja[k-1]);
                  //trenutniRaspored[6][cnt][temp][ko] = k;
                  temp--;
                  ko--;
@@ -277,7 +289,7 @@ private:
               temp = k1;
               while(temp >= 0)
               {
-                  sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,k);
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,re,temp,stringBoja[k-1]);
                   //trenutniRaspored[6][cnt][re][temp] = k;
                   temp--;
                   re--;
@@ -286,7 +298,7 @@ private:
               ko = kolone-1;
               while(temp >= 0)
               {
-                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,stringBoja[k-1]);
                   //trenutniRaspored[6][cnt][temp][ko] = k;
                   temp--;
                   ko--;
@@ -295,7 +307,7 @@ private:
               ko = kolone-1;
               while(temp >= 0)
               {
-                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,k);
+                  sviPatterni[6]->postaviPoljeUMatrici(cnt,temp,ko,stringBoja[k-1]);
                   //trenutniRaspored[6][cnt][temp][ko] = k;
                   temp--;
                   ko--;
