@@ -6,14 +6,8 @@
 #include "QPushButton"
 #include "mainwindow.h"
 
-//MainWindow *mw;
 QPushButton *trenutni;
 int ind;
-/*void Prijava::postaviMW(MainWindow *m)
-{
-    //mw=m;
-   // m->close();
-}*/
 
 int bojee[7];
 void Prijava::vrati(int x)
@@ -230,7 +224,7 @@ void Prijava::on_tipPloce_currentIndexChanged()
 void Prijava::on_OK_clicked()
 {
     qDebug()<<"sve ok fico";
-    //sourceString = ui->sourceLineEdit->text().toUtf8().constData();
+    sourceString = ui->sourceLineEdit->text().toUtf8().constData();
     QString kolones=ui->koloneTxt->text();
     QString redovis=ui->redoviTxt->text();
     int redovi=redovis.toInt();

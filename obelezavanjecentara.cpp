@@ -61,31 +61,11 @@ private:
         if(nm<kolone*redovi)
             {
                 //todo izbaci error kako se vec izbacuju errori
+
+                qDebug() << "ne valja";
                 qDebug()<<kolone*redovi-nm;
             }
-            /*else if(nm==256)
-            {
-                redovi = 16;
-                kolone = 16;
-            }
-            else
-            {
-                //todo
-                //proveri gde je y koordinata
-                //razlika da zavisi od ukupne visine
-                int y8 = centri[7][0];
-                int y9 = centri[8][0];
-                if(max(y9,y8)-min(y8,y9)<=20)
-                {
-                    redovi = 8;
-                    kolone = 16;
-                }
-                else
-                {
-                    redovi = 16;
-                    kolone = 8;
-                }
-            }*/
+
             napraviMatricu();
     }
 
@@ -106,7 +86,7 @@ public:
     {
         redovi = r;
         kolone = k;
-        centri = new int*[r*k];
+        centri = new int*[5*r*k];
         for(int i=0;i<r*k;i++)
             centri[i] =new int[2];
         matrica = new pair<int,int>*[r];
@@ -116,18 +96,20 @@ public:
 
     void obeleziCentre(cv::Mat m_mat,int sens)
     {
-        cv::Mat abe;
-        inRange(abe, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), m_mat);
-        int belo;
-        int c=0;
-        pixelPtr = (uint8_t*)m_mat.data;
-        for(int i=0;i<m_mat.rows;i++)
+        cv::Mat maskaCentri;
+        inRange(m_mat, Scalar(255-sens, 255-sens, 255-sens), Scalar(255, 255, 255), maskaCentri);
+       // imshow("output 123",maskaCentri);
+        int bojaPiksela;
+        int indeks=0;
+        pixelPtr = (uint8_t*)maskaCentri.data;
+        for(int i=0;i<maskaCentri.rows;i++)
         {
-             for(int j=0;j<m_mat.cols;j++)
+             for(int j=0;j<maskaCentri.cols;j++)
              {
-                 belo=pixelPtr[i*m_mat.cols+j];
-                 if(belo)
+                 bojaPiksela=pixelPtr[i*maskaCentri.cols+j];
+                 if(bojaPiksela)
                  {
+                      qDebug() << "uso ovde jebeno";
                       brkomp=0;
                       iMax=i;
                       iMin=i;
@@ -135,25 +117,21 @@ public:
                       jMin=j;
                       obelezavanje(i,j,m_mat);
                       if(brkomp <= 5) continue;
-                      centri[c][1]=(jMin+jMax)/2;
-                      centri[c][0]=(iMin+iMax)/2;
-                      qDebug() << centri[c][0] << " " << centri[c][1] << "\n";
-                      c++;
+                      centri[indeks][1]=(jMin+jMax)/2;
+                      centri[indeks][0]=(iMin+iMax)/2;
+                      indeks++;
+                      //qDebug() << centri[c][0] << " " << centri[c][1] << "\n";
+
                   }
               }
          }
-         odrediDimenzije(c);
-         for(int i=0;i<c;i++)
+         qDebug() << "Indeks je " + QString::number(indeks);
+         odrediDimenzije(indeks);
+         for(int i=0;i<indeks;i++)
          {
-             pixelPtr[centri[i][0]*m_mat.cols+centri[i][1]]=255;
+             pixelPtr[centri[i][0]*maskaCentri.cols+centri[i][1]]=255;
          }
-         MainWindow::preracunavanjePozicija();
-        // preracunajPozicije();
-
-
-            //imshow("Output3",m_mat);
-
-        QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+         //imshow("output 123",maskaCentri);
     }
 
 };

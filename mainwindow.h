@@ -60,18 +60,15 @@ private slots:
 
     void on_praviMaskuBtn_clicked();
 
-    void obeleziSve();
-    void preracunavanjePozicija();
+
 
 	void on_brightBtn_clicked();
-    void preracunajPozicije();
     void vrtiPaterne();
     void brojKorakaPoPaternu(int re,int ko);
 
     void proveraSlike(int patt,int kor,cv::Mat mat,cv::Mat bela);
 
     void on_obeleziBtn_clicked();
-    void obelezavanje(int i,int j);
     void testiranjeAuto();
     //void called_from_async();
 private:
