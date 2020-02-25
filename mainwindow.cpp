@@ -11,6 +11,8 @@
 #include "prijava.h"
 #include "QMessageBox"
 #include <qstylefactory.h>
+#include <qelapsedtimer.h>
+
 //zastava
 //sve
 //4
@@ -19,6 +21,9 @@
 //sporedna
 //glavna
 
+
+QElapsedTimer qelat;
+bool aaaaa=false;
 pair<int,int>** koordinateCentara;
 Pattern** preracunatRaspored;
 int ukupanBrojKoraka;
@@ -161,7 +166,6 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
         for(int j=0;j<kolone;j++)
         {
             //qDebug() << i << " " << j;
-
             int yc = koordinateCentara[i][j].first;
             int xc = koordinateCentara[i][j].second;
             int ce = pixptr2[yc*bela.cols + xc];
@@ -497,7 +501,29 @@ void stampa(int p,int c)
     }
     qDebug() << "\n";
 }
-
+void MainWindow::on_nadjiDelay_clicked()
+{
+    qelat.start();
+    mTester.nextPattern();
+    aaaaa=true;
+    /*while(true)
+    {
+        if(ce>100)
+        {
+            qDebug()<<qelat.elapsed();
+            break;
+        }
+        if (!m_videoCapture.isOpened() || !m_videoCapture.read(abe) || abe.empty())
+        {
+            on_stopBtn_clicked();
+            return;
+        }
+        imshow("output",abe);
+        piksd = (uint8_t*)abe.data;
+        ce = piksd[400*abe.cols + 400*3+2];
+    }*/
+    //imshow("delaymask",belad);
+}
 void provera()
 {
     //pattern 0
@@ -566,6 +592,18 @@ void MainWindow::on_stopBtn_clicked()
 
 void MainWindow::onFrameTimer()
 {
+    if(aaaaa)
+    {
+        uint8_t* piksd;
+        piksd = (uint8_t*)abe.data;
+        int ce = piksd[400*abe.cols*3 + 400*3+2];
+        qDebug()<<ce;
+        if(ce>230)
+        {
+            qDebug()<<qelat.elapsed();
+            aaaaa=false;
+        }
+    }
     if (!m_videoCapture.isOpened() || !m_videoCapture.read(abe) || abe.empty())
     {
         on_stopBtn_clicked();

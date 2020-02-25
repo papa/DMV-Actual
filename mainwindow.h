@@ -53,6 +53,8 @@ private slots:
     void on_prevStepBtn_clicked() { mTester.prevStep(); }
     void on_nextStepBtn_clicked() { mTester.nextStep(); }
 
+    void on_nadjiDelay_clicked();
+
     void citajBoje();
 
     void predjiNaSledeci();
