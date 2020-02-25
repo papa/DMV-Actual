@@ -23,6 +23,7 @@ pair<int,int>** koordinateCentara;
 Pattern** preracunatRaspored;
 int ukupanBrojKoraka;
 cv::Mat abe;
+int greskaCounter = 0;
 int sens = 70;
 int trenutniPattern=0;
 int trenutniKorak=0;
@@ -45,6 +46,8 @@ int matricaBoja[3][12]={
     {150,180,60,93,94,130,0,180,10,25,0,20}
 };*/
 
+cv::Mat belaMatrica;
+cv::Mat belaRezerva;
 Prijava *podesavanja;
 
 MainWindow::MainWindow(QWidget* parent)
@@ -144,6 +147,8 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
     uint8_t* pixptr;
     uint8_t* pixptr2;
+    uint8_t* piks;
+    piks = (uint8_t*)belaRezerva.data;
     pixptr = (uint8_t*)m.data;
     pixptr2 = (uint8_t*)bela.data;
     int ocena[redovi][kolone];
@@ -161,6 +166,8 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             int xc = koordinateCentara[i][j].second;
             int ce = pixptr2[yc*bela.cols + xc];
 
+            piks[yc*bela.cols + xc] = 100;
+
             // qDebug() << yc << " " << xc;
 
             //if(ce) qDebug() << "upaljen";
@@ -174,7 +181,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(ce && preracunatRaspored[pat]->getBoja(kor,i,j)==0)
             {
-                return 3;
+                //return 3;
                 //qDebug() << "svetli a ne treba da svetli";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,3));
                 ocena[i][j] = 3;
@@ -183,7 +190,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(!ce && preracunatRaspored[pat]->getBoja(kor,i,j)!=0)
             {
-                return 2;
+                //return 2;
                 //qDebug() << "ne svetli a treba da svetli";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,2));
                 ocena[i][j] = 2;
@@ -211,7 +218,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(cntoko < 0)
             {
-                return 4;
+                //return 4;
                //qDebug() << "svetli drugom bojom";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,4));
                 ocena[i][j] = 4;
@@ -224,24 +231,35 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
     }
     //qDebug() << "\n";
 
-  /*  for(int i=0;i<redovi;i++)
+    bool valja = true;
+
+    for(int i=0;i<redovi;i++)
     {
         QString qs = "";
         for(int j=0;j<kolone;j++)
         {
+            int yc = koordinateCentara[i][j].first;
+            int xc = koordinateCentara[i][j].second;
+            //int ce = pixptr2[yc*bela.cols + xc];
+
+            if( preracunatRaspored[pat]->getBoja(kor,i,j)!=0) piks[yc*bela.cols + xc] = 100;
+
             if(ocena[i][j]!=1)
             {
-               return ocena[i][j];
-               qDebug() << "Greska " << ocena[i][j];
-               exit(0);
+                valja = false;
+               //return ocena[i][j];
+              // qDebug() << "Greska " << ocena[i][j];
+               //exit(0);
             }
             qs=qs + QString::number(ocena[i][j]) + " ";
         }
         qDebug() << qs;
     }
-    qDebug() << "\n";*/
+    qDebug() << "\n";
 
-    return 1;
+    if(valja)  return 1;
+
+    return 2;
 }
 
 bool preso;
@@ -290,7 +308,6 @@ extern int MainWindow::vrtiPaterne(int par)
     preso = false;
 
     cv::Mat mat;
-    cv::Mat belaMatrica;
     cv::Mat hsvsh;
 
     qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
@@ -301,6 +318,7 @@ extern int MainWindow::vrtiPaterne(int par)
     //QLabel *label4 = new QLabel;
     //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(trenutnaBoja));
     inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
+    belaRezerva=belaMatrica;
     //cvtColor(abe, hsvsh, CV_BGR2HSV);
     inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
 
@@ -385,7 +403,11 @@ void MainWindow::testiranjeAuto()
         {
             qDebug() << QString::number(treciput);
             qDebug() << "Govno 3";
-            exit(0);
+            //exit(0);
+            greskaCounter++;
+            imshow("Greska " + to_string(greskaCounter), abe);
+            imshow("Mreska " + to_string(greskaCounter), belaRezerva);
+            break;
         }
        // predjiNaSledeci();
         qDebug() << "Govno oprano";
