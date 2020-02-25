@@ -248,36 +248,8 @@ bool preso;
 bool fail;
 int ug;
 
-extern void MainWindow::vrtiPaterne()
+void MainWindow::predjiNaSledeci()
 {
-    //qDebug() << progress;
-
-    preso = false;
-
-    cv::Mat mat;
-    cv::Mat belaMatrica;
-    cv::Mat hsvsh;
-
-    qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
-
-    int tp = trenutniPattern;
-    int tk = trenutniKorak;
-    int tb = trenutnaBoja;
-
-    int tp2 = tp;
-    int tk2 = tk;
-    int tb2 = tb;
-
-    //ui->progressBar->setValue(progress);
-    //ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(boje[trenutnaBoja]));
-    //QLabel *label4 = new QLabel;
-    //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(trenutnaBoja));
-    inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
-    //cvtColor(abe, hsvsh, CV_BGR2HSV);
-    inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
-
-    if(!fail)
-    {
     trenutniKorak++;
     if(trenutniKorak==niz[trenutniPattern])
     {
@@ -309,18 +281,37 @@ extern void MainWindow::vrtiPaterne()
     {
         mTester.nextStep();
     }
-    }
+}
 
-    int dobar =  proveraSlike(tp,tk,mat,belaMatrica);
+extern int MainWindow::vrtiPaterne(int par)
+{
+    //qDebug() << progress;
 
-    if(dobar!=1)
-    {
-        ug++;
-        if(ug==2)
-        {
+    preso = false;
 
-        }
-    }
+    cv::Mat mat;
+    cv::Mat belaMatrica;
+    cv::Mat hsvsh;
+
+    qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
+
+
+    //ui->progressBar->setValue(progress);
+    //ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(boje[trenutnaBoja]));
+    //QLabel *label4 = new QLabel;
+    //label4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(trenutnaBoja));
+    inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
+    //cvtColor(abe, hsvsh, CV_BGR2HSV);
+    inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
+
+    int tp = trenutniPattern;
+    int tk = trenutniKorak;
+    int tb = trenutnaBoja;
+
+    if(par==3) predjiNaSledeci();
+
+    return  proveraSlike(tp,tk,mat,belaMatrica);
+
 
     /*if(dobar!=1)
     {
@@ -361,12 +352,43 @@ void MainWindow::testiranjeAuto()
         progress=(i*100)/ukupanBrojKoraka;
 
         long long x;
-        if(fail) x = 10000000;
-        else if(preso) x = 400000000*3/5;
-        else x = 290000000*2/3;
+        //if(preso) x = 400000000*3/5;
+        //else
+        x = 190000000;
         while(x > 0) x--;
 
-        vrtiPaterne();
+        int prviput = vrtiPaterne(1);
+        if(prviput==1)
+        {
+            predjiNaSledeci();
+            continue;
+        }
+        qDebug() << QString::number(prviput);
+        qDebug() << "Govno 1";
+        int xx = 80000000;
+        while(xx > 0) xx--;
+        int drugiput = vrtiPaterne(2);
+        //predjiNaSledeci();
+        if(drugiput==1)
+        {
+            predjiNaSledeci();
+            continue;
+           // exit(0);
+        }
+        qDebug() << QString::number(drugiput);
+        qDebug() << "Govno 2";
+        xx = 80000000;
+        while(xx > 0) xx--;
+        int treciput = vrtiPaterne(3);
+        //predjiNaSledeci();
+        if(treciput!=1)
+        {
+            qDebug() << QString::number(treciput);
+            qDebug() << "Govno 3";
+            exit(0);
+        }
+       // predjiNaSledeci();
+        qDebug() << "Govno oprano";
     }
     upisiRezultateUFajl("sve je u redu");
 }
@@ -377,7 +399,7 @@ void MainWindow::on_praviMaskuBtn_clicked()
    // redovi = 8;
    // kolone = 8;
    // preracunajPozicije();
-   vrtiPaterne();
+   //vrtiPaterne();
 }
 
 QString formatiraj(int x)

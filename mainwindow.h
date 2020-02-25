@@ -55,6 +55,8 @@ private slots:
 
     void citajBoje();
 
+    void predjiNaSledeci();
+
     void on_prevPatternBtn_clicked() { mTester.prevPattern(); }
     void on_nextPatternBtn_clicked() { mTester.nextPattern(); }
 
@@ -63,7 +65,7 @@ private slots:
 
 
 	void on_brightBtn_clicked();
-    void vrtiPaterne();
+    int vrtiPaterne(int par);
     void brojKorakaPoPaternu(int re,int ko);
 
     int proveraSlike(int patt,int kor,cv::Mat mat,cv::Mat bela);
