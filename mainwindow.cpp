@@ -166,7 +166,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             int xc = koordinateCentara[i][j].second;
             int ce = pixptr2[yc*bela.cols + xc];
 
-            piks[yc*bela.cols + xc] = 100;
+            //piks[yc*bela.cols + xc] = 100;
 
             // qDebug() << yc << " " << xc;
 
@@ -235,7 +235,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
     for(int i=0;i<redovi;i++)
     {
-        QString qs = "";
+        //QString qs = "";
         for(int j=0;j<kolone;j++)
         {
             int yc = koordinateCentara[i][j].first;
@@ -251,11 +251,11 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
               // qDebug() << "Greska " << ocena[i][j];
                //exit(0);
             }
-            qs=qs + QString::number(ocena[i][j]) + " ";
+            //qs=qs + QString::number(ocena[i][j]) + " ";
         }
-        qDebug() << qs;
+       // qDebug() << qs;
     }
-    qDebug() << "\n";
+    //qDebug() << "\n";
 
     if(valja)  return 1;
 
@@ -310,7 +310,7 @@ extern int MainWindow::vrtiPaterne(int par)
     cv::Mat mat;
     cv::Mat hsvsh;
 
-    qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
+    //qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
 
 
     //ui->progressBar->setValue(progress);
@@ -326,7 +326,7 @@ extern int MainWindow::vrtiPaterne(int par)
     int tk = trenutniKorak;
     int tb = trenutnaBoja;
 
-    if(par==3) predjiNaSledeci();
+    //if(par==3) predjiNaSledeci();
 
     return  proveraSlike(tp,tk,mat,belaMatrica);
 
@@ -364,7 +364,7 @@ extern int MainWindow::vrtiPaterne(int par)
 void MainWindow::testiranjeAuto()
 {
     fail = false;
-    qDebug() << QString::number(ukupanBrojKoraka);
+    //qDebug() << QString::number(ukupanBrojKoraka);
     for(int i=0;i<=2*ukupanBrojKoraka;i++)
     {
         progress=(i*100)/ukupanBrojKoraka;
@@ -372,7 +372,7 @@ void MainWindow::testiranjeAuto()
         long long x;
         //if(preso) x = 400000000*3/5;
         //else
-        x = 190000000;
+        x = 40000000;
         while(x > 0) x--;
 
         int prviput = vrtiPaterne(1);
@@ -381,9 +381,9 @@ void MainWindow::testiranjeAuto()
             predjiNaSledeci();
             continue;
         }
-        qDebug() << QString::number(prviput);
-        qDebug() << "Govno 1";
-        int xx = 80000000;
+       // qDebug() << QString::number(prviput);
+      //  qDebug() << "Govno 1";
+        int xx = 60000000;
         while(xx > 0) xx--;
         int drugiput = vrtiPaterne(2);
         //predjiNaSledeci();
@@ -393,24 +393,24 @@ void MainWindow::testiranjeAuto()
             continue;
            // exit(0);
         }
-        qDebug() << QString::number(drugiput);
-        qDebug() << "Govno 2";
-        xx = 80000000;
+       // qDebug() << QString::number(drugiput);
+       // qDebug() << "Govno 2";
+        xx = 200000000;
         while(xx > 0) xx--;
         int treciput = vrtiPaterne(3);
         //predjiNaSledeci();
         if(treciput!=1)
         {
-            qDebug() << QString::number(treciput);
-            qDebug() << "Govno 3";
+           // qDebug() << QString::number(treciput);
+            //qDebug() << "Govno 3";
             //exit(0);
             greskaCounter++;
             imshow("Greska " + to_string(greskaCounter), abe);
             imshow("Mreska " + to_string(greskaCounter), belaRezerva);
             break;
         }
-       // predjiNaSledeci();
-        qDebug() << "Govno oprano";
+        predjiNaSledeci();
+       // qDebug() << "Govno oprano";
     }
     upisiRezultateUFajl("sve je u redu");
 }
