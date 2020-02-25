@@ -10,6 +10,7 @@
 #include "preracunavanjepozicija.cpp"
 #include "prijava.h"
 #include "QMessageBox"
+#include <qstylefactory.h>
 //zastava
 //sve
 //4
@@ -56,7 +57,7 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(&m_frameTimer, &QTimer::timeout         ,
                      this         , &MainWindow::onFrameTimer);
     podaciSave=new podaci();
-
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
     this->setVisible(false);
     Prijava *prijava=new Prijava(this);
     prijava->setujPodaci(podaciSave);
@@ -130,7 +131,7 @@ QString napraviPorukuZaGresku(int pat,int kor,int red,int kol,int tip)
     return poruka;
 }
 
-void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
+int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 {
     //1-dobro (svetli i treba da svetli ili ne svetli i ne treba da svetli)
     //2-lose(treba da svetli a ne svetli)
@@ -173,6 +174,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(ce && preracunatRaspored[pat]->getBoja(kor,i,j)==0)
             {
+                return 3;
                 //qDebug() << "svetli a ne treba da svetli";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,3));
                 ocena[i][j] = 3;
@@ -181,6 +183,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(!ce && preracunatRaspored[pat]->getBoja(kor,i,j)!=0)
             {
+                return 2;
                 //qDebug() << "ne svetli a treba da svetli";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,2));
                 ocena[i][j] = 2;
@@ -208,6 +211,7 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             if(cntoko < 0)
             {
+                return 4;
                //qDebug() << "svetli drugom bojom";
                 upisiRezultateUFajl(napraviPorukuZaGresku(pat,kor,i,j,4));
                 ocena[i][j] = 4;
@@ -220,13 +224,14 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
     }
     //qDebug() << "\n";
 
-    for(int i=0;i<redovi;i++)
+  /*  for(int i=0;i<redovi;i++)
     {
         QString qs = "";
         for(int j=0;j<kolone;j++)
         {
             if(ocena[i][j]!=1)
             {
+               return ocena[i][j];
                qDebug() << "Greska " << ocena[i][j];
                exit(0);
             }
@@ -234,11 +239,14 @@ void MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
         }
         qDebug() << qs;
     }
-    qDebug() << "\n";
+    qDebug() << "\n";*/
 
+    return 1;
 }
 
 bool preso;
+bool fail;
+int ug;
 
 extern void MainWindow::vrtiPaterne()
 {
@@ -252,6 +260,14 @@ extern void MainWindow::vrtiPaterne()
 
     qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
 
+    int tp = trenutniPattern;
+    int tk = trenutniKorak;
+    int tb = trenutnaBoja;
+
+    int tp2 = tp;
+    int tk2 = tk;
+    int tb2 = tb;
+
     //ui->progressBar->setValue(progress);
     //ui->label_4->setText("Loop "+QString::number(1)+", sekvenca "+QString::number(trenutniPattern)+", korak "+QString::number(trenutniKorak)+", boja "+QString::number(boje[trenutnaBoja]));
     //QLabel *label4 = new QLabel;
@@ -259,7 +275,9 @@ extern void MainWindow::vrtiPaterne()
     inRange(abe, Scalar(255-sens,255-sens,255-sens), Scalar(255,255,255),belaMatrica);
     //cvtColor(abe, hsvsh, CV_BGR2HSV);
     inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
-    proveraSlike(trenutniPattern,trenutniKorak,mat,belaMatrica);
+
+    if(!fail)
+    {
     trenutniKorak++;
     if(trenutniKorak==niz[trenutniPattern])
     {
@@ -291,18 +309,61 @@ extern void MainWindow::vrtiPaterne()
     {
         mTester.nextStep();
     }
+    }
+
+    int dobar =  proveraSlike(tp,tk,mat,belaMatrica);
+
+    if(dobar!=1)
+    {
+        ug++;
+        if(ug==2)
+        {
+
+        }
+    }
+
+    /*if(dobar!=1)
+    {
+        trenutniPattern = tp2;
+        trenutniKorak = tk2;
+        trenutnaBoja = tb2;
+        if(fail)
+        {
+            qDebug() << "Naivna naivna";
+            exit(0);
+        }
+        else
+        {
+            qDebug()<<"Svetlo crveno";
+        }
+        fail = true;
+    }
+    else
+    {
+        if(fail)
+        {
+            qDebug() << "Naivna Ena Popov";
+        }
+        else
+        {
+            qDebug() << "Tako mlada";
+        }
+        fail = false;
+    }*/
 }
 
 void MainWindow::testiranjeAuto()
 {
+    fail = false;
     qDebug() << QString::number(ukupanBrojKoraka);
     for(int i=0;i<=2*ukupanBrojKoraka;i++)
     {
         progress=(i*100)/ukupanBrojKoraka;
 
         long long x;
-        if(preso) x = 600000000;
-        else x = 300000000;
+        if(fail) x = 10000000;
+        else if(preso) x = 400000000*3/5;
+        else x = 290000000*2/3;
         while(x > 0) x--;
 
         vrtiPaterne();

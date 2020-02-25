@@ -66,7 +66,7 @@ private slots:
     void vrtiPaterne();
     void brojKorakaPoPaternu(int re,int ko);
 
-    void proveraSlike(int patt,int kor,cv::Mat mat,cv::Mat bela);
+    int proveraSlike(int patt,int kor,cv::Mat mat,cv::Mat bela);
 
     void on_obeleziBtn_clicked();
     void testiranjeAuto();

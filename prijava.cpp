@@ -18,11 +18,11 @@ void Prijava::vrati(int x)
     }
     else if(x==2)
     {
-        trenutni->setStyleSheet("background-color:green");
+        trenutni->setStyleSheet("background-color:lime");
     }
     else if(x==3)
     {
-        trenutni->setStyleSheet("background-color:blue");
+        trenutni->setStyleSheet("background-color:cyan");
     }
     else if(x==4)
     {
@@ -54,8 +54,8 @@ void Prijava::setujPodatkeGlobal()
         bojee[4]=5;
         bojee[5]=6;
         ui->boja1->setStyleSheet("background-color:red");
-        ui->boja2->setStyleSheet("background-color:green");
-        ui->boja3->setStyleSheet("background-color:blue");
+        ui->boja2->setStyleSheet("background-color:lime");
+        ui->boja3->setStyleSheet("background-color:cyan");
         ui->boja4->setStyleSheet("background-color:white");
         ui->boja5->setStyleSheet("background-color:yellow");
         ui->boja6->setStyleSheet("background-color:orange");
@@ -88,11 +88,11 @@ void Prijava::setujPodatke(QString ime, QString radniNalog,QString sors,quint16 
         }
         else if(boje[i]=='2')
         {
-            bojaTr="background-color:green";
+            bojaTr="background-color:lime";
         }
         else if(boje[i]=='3')
         {
-            bojaTr="background-color:blue";
+            bojaTr="background-color:cyan";
         }
         else if(boje[i]=='4')
         {
@@ -184,8 +184,8 @@ Prijava::Prijava(QWidget *parent) :
     //bojee[4]=5;
     //bojee[5]=6;
     //ui->boja1->setStyleSheet("background-color:red");
-    //ui->boja2->setStyleSheet("background-color:green");
-    //ui->boja3->setStyleSheet("background-color:blue");
+    //ui->boja2->setStyleSheet("background-color:lime");
+    //ui->boja3->setStyleSheet("background-color:cyan");
     //ui->boja4->setStyleSheet("background-color:white");
     //ui->boja5->setStyleSheet("background-color:yellow");
     //ui->boja6->setStyleSheet("background-color:orange");

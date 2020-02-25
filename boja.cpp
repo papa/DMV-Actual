@@ -10,8 +10,8 @@ boja::boja(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->boja1->setStyleSheet("background-color:red");
-    ui->boja2->setStyleSheet("background-color:green");
-    ui->boja3->setStyleSheet("background-color:blue");
+    ui->boja2->setStyleSheet("background-color:lime");
+    ui->boja3->setStyleSheet("background-color:cyan");
     ui->boja4->setStyleSheet("background-color:white");
     ui->boja5->setStyleSheet("background-color:yellow");
     ui->boja6->setStyleSheet("background-color:orange");

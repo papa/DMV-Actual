@@ -107,7 +107,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>http://192.168.0.116:1234/video</string>
+     <string>http://192.168.0.233:4321/video</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="fpsLineEdit">
@@ -120,7 +120,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>25</string>
+     <string>35</string>
     </property>
     <property name="maxLength">
      <number>4</number>
