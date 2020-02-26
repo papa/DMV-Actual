@@ -34,6 +34,9 @@ public:
 
 private slots:
 	void onFrameTimer();
+    void onPlocaPatternTimer();
+    void onTesterTimer();
+    void onShooterTimer();
 
 	void on_startBtn_clicked();
 	void on_stopBtn_clicked();
@@ -83,6 +86,9 @@ private:
 
 
 	QTimer           m_frameTimer;
+    QTimer           plocaPatternTimer;
+    QTimer           testerTimer;
+    QTimer           shooterTimer;
     cv::VideoCapture m_videoCapture;
 	cv::Mat          m_mat;
 

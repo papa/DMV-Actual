@@ -28,6 +28,7 @@ pair<int,int>** koordinateCentara;
 Pattern** preracunatRaspored;
 int ukupanBrojKoraka;
 cv::Mat abe;
+cv::Mat frameTestMat;
 int greskaCounter = 0;
 int sens = 70;
 int trenutniPattern=0;
@@ -47,6 +48,9 @@ int matricaBoja[3][12]={
 cv::Mat belaMatrica;
 cv::Mat belaRezerva;
 Prijava *podesavanja;
+int delay;
+uint8_t* piksd;
+
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -55,8 +59,20 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
     m_frameTimer.setTimerType(Qt::TimerType::PreciseTimer);
     m_frameTimer.setSingleShot(false);
-    QObject::connect(&m_frameTimer, &QTimer::timeout         ,
-                     this         , &MainWindow::onFrameTimer);
+    plocaPatternTimer.setTimerType(Qt::TimerType::PreciseTimer);
+    plocaPatternTimer.setSingleShot(false);
+    testerTimer.setTimerType(Qt::TimerType::PreciseTimer);
+    testerTimer.setSingleShot(false);
+    shooterTimer.setTimerType(Qt::TimerType::PreciseTimer);
+    shooterTimer.setSingleShot(true);
+
+
+    QObject::connect(&plocaPatternTimer, &QTimer::timeout, this, &MainWindow::onPlocaPatternTimer);
+    QObject::connect(&m_frameTimer,&QTimer::timeout,this,&MainWindow::onFrameTimer);
+    QObject::connect(&testerTimer,&QTimer::timeout, this,&MainWindow::onTesterTimer);
+    QObject::connect(&shooterTimer,&QTimer::timeout,this,&MainWindow::onShooterTimer);
+
+
     podaciSave=new podaci();
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     this->setVisible(false);
@@ -326,9 +342,9 @@ extern int MainWindow::vrtiPaterne(int par)
     preso = false;
 
     cv::Mat mat;
-    cv::Mat hsvsh;
 
-    //qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
+
+    qDebug() << trenutniPattern << " " << trenutniKorak << " " << trenutnaBoja;
 
 
     //ui->progressBar->setValue(progress);
@@ -382,6 +398,7 @@ extern int MainWindow::vrtiPaterne(int par)
 
 void MainWindow::testiranjeAuto()
 {
+    /*
     fail = false;
     //qDebug() << QString::number(ukupanBrojKoraka);
     //trenutnaBoja=boje[0];
@@ -436,16 +453,41 @@ void MainWindow::testiranjeAuto()
         //qDebug()<<qelat.elapsed();
     }
     qDebug()<<qelat.elapsed();
-    upisiRezultateUFajl("sve je u redu");
+    upisiRezultateUFajl("sve je u redu");*/
 }
 
 
+void obeleziSve()
+{
+    obelezavanjecentara* ob = new obelezavanjecentara(redovi,kolone);
+    ob->obeleziCentre(abe,sens);
+    koordinateCentara = ob->matrica;
+}
+void preracunavanjePozicija()
+{
+    qDebug() << QString::number(redovi) + " " + QString::number(kolone);
+    preracunavanjepozicija* ppoz = new preracunavanjepozicija(redovi,kolone,6,ukupanBrojBoja,boje);
+    ppoz->preracunajSvePozicije();
+    preracunatRaspored = ppoz->sviPatterni;
+}
 void MainWindow::on_praviMaskuBtn_clicked()
 {
-   // redovi = 8;
-   // kolone = 8;
-   // preracunajPozicije();
-   //vrtiPaterne();
+    citajBoje();
+    brojKorakaPoPaternu(redovi,kolone);
+    obeleziSve();
+    preracunavanjePozicija();
+
+    piksd = (uint8_t*)abe.data;
+    //ce = piksd[360*abe.cols*3 + 335*3+2];
+    aaaaa=true;
+    qelat.restart();
+    mTester.nextPattern();
+
+    //ovde racuna delay
+    // redovi = 8;
+    // kolone = 8;
+    // preracunajPozicije();
+    //vrtiPaterne();
 }
 
 QString formatiraj(int x)
@@ -488,6 +530,7 @@ void MainWindow::citajBoje()
         qDebug() << QString::number(boje[i]);
     }
 }
+
 void MainWindow::on_startBtn_clicked()
 {
     redovi = podaciSave->redovi;
@@ -495,20 +538,22 @@ void MainWindow::on_startBtn_clicked()
     napraviFajl();
     qDebug()<<podaciSave->sourceString;
     for(int i=0;i<6;i++)
-        {
-           mTester.prevPattern();
-           std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        }
-        if (m_videoCapture.isOpened()) m_videoCapture.release();
-        if (   !m_videoCapture.open(podaciSave->sourceString.toUtf8().constData())
-            || !m_videoCapture.isOpened())
-        {
-            qDebug() << "SOURCE ERROR";
-            return;
-        }
-        const quint16 fps = podaciSave->fps;
-        m_frameTimer.setInterval(1000 / (fps ? fps : 1));
-        m_frameTimer.start();
+    {
+       mTester.prevPattern();
+       std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    }
+    if (m_videoCapture.isOpened()) m_videoCapture.release();
+    if (   !m_videoCapture.open(podaciSave->sourceString.toUtf8().constData())
+        || !m_videoCapture.isOpened())
+    {
+        qDebug() << "SOURCE ERROR";
+        return;
+    }
+    const quint16 fps = podaciSave->fps;
+    m_frameTimer.setInterval(1000 / (fps ? fps : 1));
+    m_frameTimer.start();
+    //plocaPatternTimer.setInterval(300);
+    //plocaPatternTimer.start();
 }
 
 void stampa(int p,int c)
@@ -521,19 +566,15 @@ void stampa(int p,int c)
     }
     qDebug() << "\n";
 }
-uint8_t* piksd;
+
 int ce;
 void MainWindow::on_nadjiDelay_clicked()
 {
-    qelat.start();
-    long long x = 40000000;
-    while(x > 0) x--;
-    qDebug()<<qelat.elapsed();
-    piksd = (uint8_t*)abe.data;
+    /*piksd = (uint8_t*)abe.data;
     //ce = piksd[360*abe.cols*3 + 335*3+2];
     aaaaa=true;
     qelat.restart();
-    mTester.nextPattern();
+    mTester.nextPattern();*/
 }
 void provera()
 {
@@ -567,31 +608,22 @@ void provera()
         stampa(5,c);
 }
 
-void preracunavanjePozicija()
-{
-    qDebug() << QString::number(redovi) + " " + QString::number(kolone);
-    preracunavanjepozicija* ppoz = new preracunavanjepozicija(redovi,kolone,6,ukupanBrojBoja,boje);
-    ppoz->preracunajSvePozicije();
-    preracunatRaspored = ppoz->sviPatterni;
-}
 
-void obeleziSve()
-{
-    obelezavanjecentara* ob = new obelezavanjecentara(redovi,kolone);
-    ob->obeleziCentre(abe,sens);
-    koordinateCentara = ob->matrica;
-}
+
+
 
 void MainWindow::on_obeleziBtn_clicked()
 {
-    citajBoje();
+    /*citajBoje();
     brojKorakaPoPaternu(redovi,kolone);
     obeleziSve();
-    preracunavanjePozicija();
+    preracunavanjePozicija();*/
     //provera();
     //imshow("Output3",m_mat);
 
-    QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
+
+
+    //QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
 }
 
 void MainWindow::on_stopBtn_clicked()
@@ -600,18 +632,38 @@ void MainWindow::on_stopBtn_clicked()
     m_videoCapture.release();
     cv::destroyAllWindows();
 }
+void MainWindow::onPlocaPatternTimer()
+{
+    predjiNaSledeci();
+}
 void MainWindow::onFrameTimer()
 {
     if(aaaaa)
     {
         //335 360
-
-        ce = piksd[360*abe.cols*3 + 335*3+2];
-        if(ce>200)
+        int yc = koordinateCentara[redovi/2-1][kolone/2-1].first;
+        int xc = koordinateCentara[redovi/2-1][kolone/2-1].second;
+        //ce = piksd[360*abe.cols*3 + 335*3+2];
+        ce=piksd[(yc-10)*abe.cols*3 + (xc-10)*3];
+        if(ce<100)
         {
-            qDebug()<<qelat.elapsed();
+            delay=qelat.elapsed();
+
             qDebug()<<"vreme:";
+            qDebug()<<delay;
+
+            plocaPatternTimer.setInterval(250);
+            plocaPatternTimer.start();
+            //shooterTimer.setInterval(delay+400);
+            //shooterTimer.start();
+            shooterTimer.setInterval(200);
+            shooterTimer.start();
+
             aaaaa=false;
+        }
+        else
+        {
+            qDebug()<<ce;
         }
     }
     if (!m_videoCapture.isOpened() || !m_videoCapture.read(abe) || abe.empty())
@@ -622,6 +674,23 @@ void MainWindow::onFrameTimer()
     //Indijac se zove Sadekar
     imshow("Output", abe);
 }
+
+void MainWindow::onShooterTimer()
+{
+    testerTimer.setInterval(250);
+    testerTimer.start();
+    qDebug()<<"Shooter";
+}
+
+void MainWindow::onTesterTimer()
+{
+    if(vrtiPaterne(1) !=1 )
+        qDebug()<<"Greska";
+
+
+
+}
+
 
 void MainWindow::on_brightBtn_clicked()
 {
