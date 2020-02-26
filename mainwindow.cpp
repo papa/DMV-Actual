@@ -41,16 +41,9 @@ int progress=0;
 int ukupanBrojBoja;
 int boje[6];
 int matricaBoja[3][12]={
-    {230,255,100,190,80,170,200,255,170,255,220,255},
-    {130,230,200,255,165,255,200,255,140,225,140,205},
-    {120,210,170,255,254,255,200,255,100,170,110,165}};
-//hsv odozdo na gore
-/*int matricaBoja[3][12]={
-    {50,255,50,255,50,255,0,255,50,255,50,255},
-    {30,255,30,255,30,255,0,30,30,255,30,255},
-    {150,180,60,93,94,130,0,180,10,25,0,20}
-};*/
-
+    {140,255,  0, 50,  0, 50,100,255, 50,200,100,220},
+    {  0, 50, 80,255, 50,100,100,255, 50,150,  0, 50},
+    {  0, 50,  0, 80,100,255,100,255,  0,100,  0, 50}};
 cv::Mat belaMatrica;
 cv::Mat belaRezerva;
 Prijava *podesavanja;
@@ -148,7 +141,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
     //todo
     //odredi precizno granicu
-    int granica = 5;
+    int granica_boja = 15;
 
     uint8_t* pixptr;
     uint8_t* pixptr2;
@@ -168,7 +161,28 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
             //qDebug() << i << " " << j;
             int yc = koordinateCentara[i][j].first;
             int xc = koordinateCentara[i][j].second;
-            int ce = pixptr2[yc*bela.cols + xc];
+            //int ce = pixptr2[yc*bela.cols + xc];
+            int ce = 0;
+
+            int ystart = yc-4;
+            int xstart = xc-4;
+            int yend = yc+4;
+            int xend = xc+4;
+            int brojc = 0;
+
+            for(int k = ystart;k<=yend;k++)
+            {
+                for(int l=xstart;l<=xend;l++)
+                {
+                    int boja = pixptr2[k*bela.cols + l];
+                    if(boja) brojc++;
+                }
+            }
+
+           // qDebug() << "Zivot je kazino";
+           // qDebug() << QString::number(brojc);
+            if(brojc>=10) ce = 1;
+
 
             //piks[yc*bela.cols + xc] = 100;
 
@@ -201,10 +215,10 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
                 continue;
             }
 
-            int ystart = yc - 25;
-            int xstart = xc - 25;
-            int yend = yc+25;
-            int xend = xc+25;
+            ystart = yc - 10;
+            xstart = xc - 10;
+            yend = yc+10;
+            xend = xc+10;
             int cntoko = 0;
 
            // qDebug() << ystart << " " << yend << " " << xstart << " " << xend;
@@ -220,7 +234,7 @@ int MainWindow::proveraSlike(int pat,int kor,cv::Mat m,cv::Mat bela)
 
             //qDebug() << cntoko << " ";
 
-            if(cntoko < 0)
+            if(cntoko < granica_boja)
             {
                 //return 4;
                //qDebug() << "svetli drugom bojom";
@@ -326,6 +340,7 @@ extern int MainWindow::vrtiPaterne(int par)
     //cvtColor(abe, hsvsh, CV_BGR2HSV);
     inRange(abe, Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2],matricaBoja[1][(boje[trenutnaBoja]-1)*2],matricaBoja[0][(boje[trenutnaBoja]-1)*2] ), Scalar(matricaBoja[2][(boje[trenutnaBoja]-1)*2+1],matricaBoja[1][(boje[trenutnaBoja]-1)*2+1],matricaBoja[0][(boje[trenutnaBoja]-1)*2+1]), mat);
 
+    //imshow("maska",mat);
     int tp = trenutniPattern;
     int tk = trenutniKorak;
     int tb = trenutnaBoja;
@@ -369,6 +384,8 @@ void MainWindow::testiranjeAuto()
 {
     fail = false;
     //qDebug() << QString::number(ukupanBrojKoraka);
+    //trenutnaBoja=boje[0];
+    qelat.restart();
     for(int i=0;i<=2*ukupanBrojKoraka;i++)
     {
         progress=(i*100)/ukupanBrojKoraka;
@@ -376,13 +393,13 @@ void MainWindow::testiranjeAuto()
         long long x;
         //if(preso) x = 400000000*3/5;
         //else
-        x = 40000000;
+        x = 90000000;
         while(x > 0) x--;
-
         int prviput = vrtiPaterne(1);
         if(prviput==1)
         {
             predjiNaSledeci();
+            //qDebug()<<qelat.elapsed();
             continue;
         }
        // qDebug() << QString::number(prviput);
@@ -394,12 +411,13 @@ void MainWindow::testiranjeAuto()
         if(drugiput==1)
         {
             predjiNaSledeci();
+            //qDebug()<<qelat.elapsed();
             continue;
            // exit(0);
         }
        // qDebug() << QString::number(drugiput);
        // qDebug() << "Govno 2";
-        xx = 200000000;
+        xx = 300000000;
         while(xx > 0) xx--;
         int treciput = vrtiPaterne(3);
         //predjiNaSledeci();
@@ -415,7 +433,9 @@ void MainWindow::testiranjeAuto()
         }
         predjiNaSledeci();
        // qDebug() << "Govno oprano";
+        //qDebug()<<qelat.elapsed();
     }
+    qDebug()<<qelat.elapsed();
     upisiRezultateUFajl("sve je u redu");
 }
 
@@ -501,28 +521,19 @@ void stampa(int p,int c)
     }
     qDebug() << "\n";
 }
+uint8_t* piksd;
+int ce;
 void MainWindow::on_nadjiDelay_clicked()
 {
     qelat.start();
-    mTester.nextPattern();
+    long long x = 40000000;
+    while(x > 0) x--;
+    qDebug()<<qelat.elapsed();
+    piksd = (uint8_t*)abe.data;
+    //ce = piksd[360*abe.cols*3 + 335*3+2];
     aaaaa=true;
-    /*while(true)
-    {
-        if(ce>100)
-        {
-            qDebug()<<qelat.elapsed();
-            break;
-        }
-        if (!m_videoCapture.isOpened() || !m_videoCapture.read(abe) || abe.empty())
-        {
-            on_stopBtn_clicked();
-            return;
-        }
-        imshow("output",abe);
-        piksd = (uint8_t*)abe.data;
-        ce = piksd[400*abe.cols + 400*3+2];
-    }*/
-    //imshow("delaymask",belad);
+    qelat.restart();
+    mTester.nextPattern();
 }
 void provera()
 {
@@ -577,7 +588,7 @@ void MainWindow::on_obeleziBtn_clicked()
     brojKorakaPoPaternu(redovi,kolone);
     obeleziSve();
     preracunavanjePozicija();
-    provera();
+    //provera();
     //imshow("Output3",m_mat);
 
     QFuture<void> future = QtConcurrent::run(this,MainWindow::testiranjeAuto);
@@ -589,18 +600,17 @@ void MainWindow::on_stopBtn_clicked()
     m_videoCapture.release();
     cv::destroyAllWindows();
 }
-
 void MainWindow::onFrameTimer()
 {
     if(aaaaa)
     {
-        uint8_t* piksd;
-        piksd = (uint8_t*)abe.data;
-        int ce = piksd[400*abe.cols*3 + 400*3+2];
-        qDebug()<<ce;
-        if(ce>230)
+        //335 360
+
+        ce = piksd[360*abe.cols*3 + 335*3+2];
+        if(ce>200)
         {
             qDebug()<<qelat.elapsed();
+            qDebug()<<"vreme:";
             aaaaa=false;
         }
     }
