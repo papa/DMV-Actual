@@ -31,7 +31,7 @@ cv::Mat abe;
 cv::Mat frameTestMat;
 int greskaCounter = 0;
 int sens = 70;
-int trenutniPattern=0;
+int trenutniPattern=-1;
 int trenutniKorak=0;
 int trenutnaBoja=0;
 int trenutniRaspored[10][80][20][20];
@@ -302,6 +302,12 @@ int ug;
 
 void MainWindow::predjiNaSledeci()
 {
+    if(trenutniPattern==-1)
+    {
+        trenutniPattern = trenutniKorak = trenutnaBoja = 0;
+        return;
+    }
+
     trenutniKorak++;
     if(trenutniKorak==niz[trenutniPattern])
     {
@@ -652,11 +658,12 @@ void MainWindow::onFrameTimer()
             qDebug()<<"vreme:";
             qDebug()<<delay;
 
-            plocaPatternTimer.setInterval(250);
+            plocaPatternTimer.setInterval(100);
             plocaPatternTimer.start();
             //shooterTimer.setInterval(delay+400);
             //shooterTimer.start();
-            shooterTimer.setInterval(200);
+            //mTester.nextPattern();
+            shooterTimer.setInterval(delay);
             shooterTimer.start();
 
             aaaaa=false;
@@ -677,7 +684,7 @@ void MainWindow::onFrameTimer()
 
 void MainWindow::onShooterTimer()
 {
-    testerTimer.setInterval(250);
+    testerTimer.setInterval(100);
     testerTimer.start();
     qDebug()<<"Shooter";
 }
